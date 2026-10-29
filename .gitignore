@@ -2,3 +2,18 @@ venv/
 .env
 __pycache__/
 .vscode/
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Local environment
+.venv/
+venv/
+
+# Local proof files
+proofs/

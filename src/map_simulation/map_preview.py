@@ -1,4 +1,5 @@
 import json
+import math
 from pathlib import Path
 
 import pandas as pd
@@ -6,13 +7,13 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 
-# --------------------------------------------------
+# =========================================================
 # 1. PAGE CONFIGURATION
-# --------------------------------------------------
+# =========================================================
 
 st.set_page_config(
-    page_title="MediResQ AI - Vehicle Simulation",
-    page_icon="🚑",
+    page_title="MediResQ AI - Hospital Map",
+    page_icon="🏥",
     layout="wide",
 )
 
@@ -23,75 +24,280 @@ HOSPITALS_FILE = BASE_DIR / "hospital_locations.csv"
 ROUTES_FILE = BASE_DIR / "map_routes.json"
 ANIMATION_FILE = BASE_DIR / "vehicle_animation.json"
 
+INVENTORY_FILE = PROJECT_DIR / "data" / "inventory_batches.csv"
+
 REDISTRIBUTION_FILE = (
     PROJECT_DIR / "data" / "distance_redistribution_plan.csv"
 )
 
-ANIMATION_DURATION_SECONDS = 30
+ANIMATION_DURATION = 30
 
 
-# --------------------------------------------------
-# 2. LOAD DATA
-# --------------------------------------------------
+# =========================================================
+# 2. PAGE HEADER
+# =========================================================
 
-@st.cache_data
-def load_data():
-    hospitals = pd.read_csv(HOSPITALS_FILE)
-
-    with open(ROUTES_FILE, "r", encoding="utf-8") as file:
-        routes = json.load(file)
-
-    with open(ANIMATION_FILE, "r", encoding="utf-8") as file:
-        animations = json.load(file)
-
-    if REDISTRIBUTION_FILE.exists():
-        transfers = pd.read_csv(REDISTRIBUTION_FILE)
-    else:
-        transfers = pd.DataFrame()
-
-    return hospitals, routes, animations, transfers
-
-
-st.title("MediResQ AI")
-st.subheader("Hospital Medicine Redistribution — Vehicle Simulation")
+st.title("🏥 MediResQ AI")
+st.subheader("Hospital Medicine Redistribution & Vehicle Simulation")
 
 st.caption(
-    "Demonstration mode: hospital inventory, medicine transfers, "
-    "and vehicle movement are simulated. Travel estimates are not "
-    "live traffic data."
+    "Interactive demonstration of hospital locations, medicine "
+    "stock balances, proposed transfers, and simulated vehicle movement."
 )
 
-try:
-    (
-        hospitals_df,
-        routes_data,
-        animation_data,
-        transfers_df,
-    ) = load_data()
 
-except FileNotFoundError as error:
-    st.error(f"Required project file not found: {error}")
-    st.info(
-        "Check that hospital_locations.csv, map_routes.json, "
-        "and vehicle_animation.json are inside src/map_simulation."
+# =========================================================
+# 3. LOAD DATA
+# =========================================================
+
+@st.cache_data
+def load_json(path):
+    if not path.exists():
+        return []
+
+    with open(path, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+@st.cache_data
+def load_csv(path):
+    if not path.exists():
+        return pd.DataFrame()
+
+    return pd.read_csv(path)
+
+
+hospitals_df = load_csv(HOSPITALS_FILE)
+routes_data = load_json(ROUTES_FILE)
+animation_data = load_json(ANIMATION_FILE)
+
+inventory_df = load_csv(INVENTORY_FILE)
+transfers_df = load_csv(REDISTRIBUTION_FILE)
+
+
+if hospitals_df.empty:
+    st.error(f"No hospital records found: {HOSPITALS_FILE}")
+    st.stop()
+
+
+# =========================================================
+# 4. NORMALIZE COLUMN NAMES
+# =========================================================
+
+def normalize_columns(dataframe):
+    dataframe = dataframe.copy()
+    dataframe.columns = [
+        str(column).strip().lower()
+        for column in dataframe.columns
+    ]
+    return dataframe
+
+
+hospitals_df = normalize_columns(hospitals_df)
+
+if not inventory_df.empty:
+    inventory_df = normalize_columns(inventory_df)
+
+if not transfers_df.empty:
+    transfers_df = normalize_columns(transfers_df)
+
+
+def find_column(dataframe, possible_names):
+    for name in possible_names:
+        if name.lower() in dataframe.columns:
+            return name.lower()
+    return None
+
+
+id_column = find_column(
+    hospitals_df,
+    ["hospital_id", "id", "hospitalid"],
+)
+
+name_column = find_column(
+    hospitals_df,
+    ["hospital_name", "name", "hospital"],
+)
+
+latitude_column = find_column(
+    hospitals_df,
+    ["latitude", "lat", "location_lat", "hospital_latitude"],
+)
+
+longitude_column = find_column(
+    hospitals_df,
+    [
+        "longitude",
+        "lon",
+        "lng",
+        "location_lon",
+        "location_lng",
+        "hospital_longitude",
+    ],
+)
+
+
+# =========================================================
+# 5. CALCULATE HOSPITAL STOCK BALANCES
+# =========================================================
+
+required_inventory_columns = {
+    "hospital_id",
+    "quantity_in_stock",
+    "expiry_date",
+}
+
+if inventory_df.empty:
+    stock_summary = pd.DataFrame(
+        columns=["total_stock", "usable_stock"]
     )
+
+    st.warning(
+        f"Inventory data could not be loaded from {INVENTORY_FILE}"
+    )
+
+elif not required_inventory_columns.issubset(inventory_df.columns):
+    stock_summary = pd.DataFrame(
+        columns=["total_stock", "usable_stock"]
+    )
+
+    missing_columns = (
+        required_inventory_columns - set(inventory_df.columns)
+    )
+
+    st.error(
+        "Inventory CSV is missing required columns: "
+        + ", ".join(sorted(missing_columns))
+    )
+
+else:
+    inventory_df["hospital_id"] = (
+        inventory_df["hospital_id"]
+        .astype(str)
+        .str.strip()
+    )
+
+    inventory_df["quantity_in_stock"] = pd.to_numeric(
+        inventory_df["quantity_in_stock"],
+        errors="coerce",
+    ).fillna(0)
+
+    inventory_df["expiry_date"] = pd.to_datetime(
+        inventory_df["expiry_date"],
+        errors="coerce",
+    )
+
+    today = pd.Timestamp.now().normalize()
+
+    # Expiry date must be today or later to count as unexpired.
+    inventory_df["usable_stock"] = inventory_df.apply(
+        lambda row: (
+            row["quantity_in_stock"]
+            if (
+                pd.notna(row["expiry_date"])
+                and row["expiry_date"] >= today
+            )
+            else 0
+        ),
+        axis=1,
+    )
+
+    stock_summary = (
+        inventory_df.groupby("hospital_id")
+        .agg(
+            total_stock=("quantity_in_stock", "sum"),
+            usable_stock=("usable_stock", "sum"),
+        )
+    )
+
+
+stock_data = {}
+
+for hospital_id, row in stock_summary.iterrows():
+    stock_data[str(hospital_id).strip()] = {
+        "total_stock": int(round(row["total_stock"])),
+        "usable_stock": int(round(row["usable_stock"])),
+    }
+
+
+# =========================================================
+# 6. PREPARE HOSPITAL LOCATIONS
+# =========================================================
+
+hospital_points = []
+
+if latitude_column and longitude_column:
+
+    for index, row in hospitals_df.iterrows():
+        try:
+            latitude = float(row[latitude_column])
+            longitude = float(row[longitude_column])
+        except (ValueError, TypeError):
+            continue
+
+        if not (
+            math.isfinite(latitude)
+            and math.isfinite(longitude)
+            and -90 <= latitude <= 90
+            and -180 <= longitude <= 180
+        ):
+            continue
+
+        hospital_id = (
+            str(row[id_column]).strip()
+            if id_column and pd.notna(row[id_column])
+            else str(index + 1)
+        )
+
+        hospital_name = (
+            str(row[name_column])
+            if name_column and pd.notna(row[name_column])
+            else f"Hospital {hospital_id}"
+        )
+
+        stock = stock_data.get(
+            hospital_id,
+            {
+                "total_stock": 0,
+                "usable_stock": 0,
+            },
+        )
+
+        hospital_points.append(
+            {
+                "id": hospital_id,
+                "name": hospital_name,
+                "lat": latitude,
+                "lon": longitude,
+                "total_stock": stock["total_stock"],
+                "usable_stock": stock["usable_stock"],
+            }
+        )
+
+
+if not hospital_points:
+    st.error(
+        "Hospital markers could not be created. "
+        "Check hospital_locations.csv for valid latitude "
+        "and longitude columns."
+    )
+
+    st.write("Columns found:")
+    st.code(", ".join(hospitals_df.columns))
+
     st.stop()
 
-except (json.JSONDecodeError, pd.errors.ParserError, ValueError) as error:
-    st.error(f"Could not read the simulation data: {error}")
-    st.stop()
 
+# =========================================================
+# 7. NORMALIZE ROUTE DATA
+# =========================================================
 
-# --------------------------------------------------
-# 3. NORMALIZE JSON DATA
-# --------------------------------------------------
-
-def extract_records(data, possible_keys):
+def extract_records(data, keys):
     if isinstance(data, list):
         return data
 
     if isinstance(data, dict):
-        for key in possible_keys:
+        for key in keys:
             if isinstance(data.get(key), list):
                 return data[key]
 
@@ -109,56 +315,37 @@ animation_records = extract_records(
 )
 
 
-def get_route_id(record, fallback_index):
+def get_route_id(record, index):
     return str(
         record.get(
             "transfer_id",
-            record.get(
-                "route_id",
-                record.get("id", fallback_index + 1),
-            ),
+            record.get("route_id", record.get("id", index + 1)),
         )
     )
 
 
-# --------------------------------------------------
-# 4. EXTRACT ROUTE COORDINATES
-# --------------------------------------------------
-
-def route_coordinates_from_record(record):
+def extract_coordinates(record):
     if not isinstance(record, dict):
         return []
 
-    # GeoJSON Feature.
-    if record.get("type") == "Feature":
-        geometry = record.get("geometry", {})
-
-        if (
-            isinstance(geometry, dict)
-            and geometry.get("type") == "LineString"
-        ):
-            return [
-                [float(point[1]), float(point[0])]
-                for point in geometry.get("coordinates", [])
-                if len(point) >= 2
-            ]
-
     geometry = record.get("geometry")
 
-    # Nested GeoJSON geometry.
     if isinstance(geometry, dict):
         if geometry.get("type") == "LineString":
-            return [
-                [float(point[1]), float(point[0])]
-                for point in geometry.get("coordinates", [])
-                if len(point) >= 2
-            ]
+            result = []
 
-    # OSRM may store geometry as an encoded string.
-    if isinstance(geometry, str):
-        return []
+            for point in geometry.get("coordinates", []):
+                if len(point) >= 2:
+                    try:
+                        result.append([
+                            float(point[1]),
+                            float(point[0]),
+                        ])
+                    except (ValueError, TypeError):
+                        continue
 
-    # Custom formats are assumed to use [latitude, longitude].
+            return result
+
     for key in [
         "route_coordinates",
         "path",
@@ -170,30 +357,29 @@ def route_coordinates_from_record(record):
         if not isinstance(value, list) or not value:
             continue
 
-        first = value[0]
-
-        if (
-            isinstance(first, (list, tuple))
-            and len(first) >= 2
-            and isinstance(first[0], (int, float))
-            and isinstance(first[1], (int, float))
+        if all(
+            isinstance(point, (list, tuple))
+            and len(point) >= 2
+            for point in value
         ):
-            return [
-                [float(point[0]), float(point[1])]
-                for point in value
-                if len(point) >= 2
-            ]
+            try:
+                return [
+                    [float(point[0]), float(point[1])]
+                    for point in value
+                ]
+            except (ValueError, TypeError):
+                continue
 
     return []
 
 
-def route_label(record, index):
-    origin = (
+def route_name(record, index):
+    source = (
         record.get("from_hospital_name")
         or record.get("source_hospital")
         or record.get("from_hospital")
         or record.get("origin")
-        or "Origin"
+        or "Source"
     )
 
     destination = (
@@ -204,563 +390,305 @@ def route_label(record, index):
         or "Destination"
     )
 
-    return (
-        f"{get_route_id(record, index)}: "
-        f"{origin} → {destination}"
-    )
+    return f"Route {index + 1}: {source} → {destination}"
 
 
-# --------------------------------------------------
-# 5. HOSPITAL LOOKUP
-# --------------------------------------------------
+routes = []
 
-hospital_name_by_id = {}
-
-for _, row in hospitals_df.iterrows():
-    hospital_id = str(row.get("hospital_id", "")).strip()
-    hospital_name = str(row.get("hospital_name", "Hospital")).strip()
-
-    if hospital_id:
-        hospital_name_by_id[hospital_id] = hospital_name
-
-
-def hospital_name(hospital_id):
-    hospital_id = str(hospital_id).strip()
-
-    return hospital_name_by_id.get(
-        hospital_id,
-        f"Hospital {hospital_id}",
-    )
-
-
-# --------------------------------------------------
-# 6. PREPARE TRANSFERS
-# --------------------------------------------------
-
-required_transfer_columns = {
-    "drug_id",
-    "drug_name",
-    "from_hospital",
-    "to_hospital",
-    "transfer_quantity",
-    "transfer_status",
-}
-
-transfers_available = (
-    not transfers_df.empty
-    and required_transfer_columns.issubset(
-        set(transfers_df.columns)
-    )
-)
-
-if transfers_available:
-    transfers_df = transfers_df.copy()
-
-    for column in [
-        "drug_id",
-        "drug_name",
-        "from_hospital",
-        "to_hospital",
-        "transfer_status",
-    ]:
-        transfers_df[column] = (
-            transfers_df[column].fillna("").astype(str).str.strip()
-        )
-
-    transfers_df["from_hospital_name"] = (
-        transfers_df["from_hospital"].map(hospital_name)
-    )
-
-    transfers_df["to_hospital_name"] = (
-        transfers_df["to_hospital"].map(hospital_name)
-    )
-
-    transfers_df["transfer_quantity"] = pd.to_numeric(
-        transfers_df["transfer_quantity"],
-        errors="coerce",
-    )
-
-    if "recipient_priority" in transfers_df.columns:
-        transfers_df["recipient_priority"] = pd.to_numeric(
-            transfers_df["recipient_priority"],
-            errors="coerce",
-        )
-
-    if "simulated_distance" in transfers_df.columns:
-        transfers_df["simulated_distance"] = pd.to_numeric(
-            transfers_df["simulated_distance"],
-            errors="coerce",
-        )
-
-else:
-    st.warning(
-        "The redistribution CSV is missing or its column names "
-        "do not match the expected format. The map can still run, "
-        "but medicine transfer details will not be displayed."
-    )
-
-
-# --------------------------------------------------
-# 7. MATCH ROUTES TO TRANSFERS
-# --------------------------------------------------
-
-route_lookup = {}
-transfer_options = []
-
-for index, route in enumerate(route_records):
-    if not isinstance(route, dict):
+for index, record in enumerate(route_records):
+    if not isinstance(record, dict):
         continue
 
-    route_id = get_route_id(route, index)
-
-    animation = next(
-        (
-            item
-            for animation_index, item in enumerate(animation_records)
-            if isinstance(item, dict)
-            and get_route_id(item, animation_index) == route_id
-        ),
-        {},
-    )
-
-    coordinates = route_coordinates_from_record(route)
-
-    if not coordinates:
-        coordinates = route_coordinates_from_record(animation)
+    coordinates = extract_coordinates(record)
 
     if len(coordinates) < 2:
         continue
 
-    source_id = str(
-        route.get(
-            "from_hospital",
-            route.get("source_hospital_id", ""),
-        )
-    ).strip()
-
-    destination_id = str(
-        route.get(
-            "to_hospital",
-            route.get("destination_hospital_id", ""),
-        )
-    ).strip()
-
-    option = {
-        "id": route_id,
-        "label": route_label(route, index),
-        "route": route,
-        "animation": animation,
-        "coordinates": coordinates,
-        "source_id": source_id,
-        "destination_id": destination_id,
-    }
-
-    transfer_options.append(option)
-    route_lookup[route_id] = option
-
-
-# --------------------------------------------------
-# 8. SELECT JOURNEY
-# --------------------------------------------------
-
-if not transfer_options:
-    st.error(
-        "No usable route geometry was found in map_routes.json "
-        "or vehicle_animation.json."
-    )
-    st.stop()
-
-
-route_labels = [item["label"] for item in transfer_options]
-
-selected_label = st.selectbox(
-    "Select a redistribution journey",
-    route_labels,
-)
-
-selected_transfer = next(
-    item
-    for item in transfer_options
-    if item["label"] == selected_label
-)
-
-selected_route = selected_transfer["route"]
-selected_animation = selected_transfer["animation"]
-selected_coordinates = selected_transfer["coordinates"]
-
-
-# --------------------------------------------------
-# 9. MATCH SELECTED ROUTE TO REDISTRIBUTION ROWS
-# --------------------------------------------------
-
-matching_transfers = pd.DataFrame()
-
-if transfers_available:
-    source_id = selected_transfer["source_id"]
-    destination_id = selected_transfer["destination_id"]
-
-    if source_id and destination_id:
-        matching_transfers = transfers_df[
-            (
-                transfers_df["from_hospital"] == source_id
-            )
-            & (
-                transfers_df["to_hospital"] == destination_id
-            )
-        ].copy()
-
-    else:
-        st.caption(
-            "This route's JSON does not expose source and destination "
-            "hospital IDs. Medicine transfers cannot be matched to this "
-            "route automatically until those IDs are available."
-        )
-
-
-# --------------------------------------------------
-# 10. HOSPITAL MARKERS
-# --------------------------------------------------
-
-hospital_points = []
-
-for _, row in hospitals_df.iterrows():
-    try:
-        latitude = float(row["latitude"])
-        longitude = float(row["longitude"])
-    except (ValueError, TypeError, KeyError):
-        continue
-
-    if not (
-        -90 <= latitude <= 90
-        and -180 <= longitude <= 180
-    ):
-        continue
-
-    hospital_points.append(
+    routes.append(
         {
-            "name": str(row.get("hospital_name", "Hospital")),
-            "id": str(row.get("hospital_id", "")),
-            "lat": latitude,
-            "lon": longitude,
+            "id": get_route_id(record, index),
+            "name": route_name(record, index),
+            "coordinates": coordinates,
+            "source": str(
+                record.get(
+                    "from_hospital",
+                    record.get("source_hospital_id", ""),
+                )
+            ),
+            "destination": str(
+                record.get(
+                    "to_hospital",
+                    record.get("destination_hospital_id", ""),
+                )
+            ),
         }
     )
 
 
-# --------------------------------------------------
-# 11. ROUTES FOR MAP
-# --------------------------------------------------
+# =========================================================
+# 8. SUMMARY METRICS
+# =========================================================
 
-all_routes_for_map = []
-
-for transfer in transfer_options:
-    all_routes_for_map.append(
-        {
-            "id": transfer["id"],
-            "label": transfer["label"],
-            "coordinates": transfer["coordinates"],
-        }
-    )
-
-
-# --------------------------------------------------
-# 12. TRAVEL TIME
-# --------------------------------------------------
-
-def get_estimated_minutes(route, animation):
-    possible_keys = [
-        "estimated_duration_minutes",
-        "duration_minutes",
-        "travel_time_minutes",
-    ]
-
-    for record in [route, animation]:
-        for key in possible_keys:
-            value = record.get(key)
-
-            if value is not None:
-                try:
-                    result = float(value)
-
-                    if result > 0:
-                        return result
-
-                except (ValueError, TypeError):
-                    pass
-
-    for record in [route, animation]:
-        value = record.get("duration")
-
-        if value is not None:
-            try:
-                result = float(value)
-
-                if result > 0:
-                    return result / 60
-
-            except (ValueError, TypeError):
-                pass
-
-    return None
-
-
-estimated_minutes = get_estimated_minutes(
-    selected_route,
-    selected_animation,
-)
-
-
-# --------------------------------------------------
-# 13. DISPLAY METRICS
-# --------------------------------------------------
-
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.metric(
-        "Estimated travel time",
-        (
-            f"{estimated_minutes:.1f} minutes"
-            if estimated_minutes is not None
-            else "Not available"
-        ),
-    )
+    st.metric("Hospitals on Map", len(hospital_points))
 
 with col2:
-    st.metric(
-        "Animation duration",
-        f"{ANIMATION_DURATION_SECONDS} seconds",
-    )
+    st.metric("Available Routes", len(routes))
 
 with col3:
+    st.metric("Transfer Records", len(transfers_df))
+
+with col4:
     st.metric(
-        "Matched medicine transfers",
-        str(len(matching_transfers)),
+        "Total Recorded Stock",
+        f"{sum(item['total_stock'] for item in hospital_points):,}",
     )
 
-st.info(
-    "The vehicle animation takes 30 seconds regardless of the "
-    "estimated travel time. It is a visualization setting, not "
-    "the actual delivery duration."
+
+st.caption(
+    "Stock is calculated from inventory_batches.csv. "
+    "Usable stock excludes batches with missing or past expiry dates. "
+    "Quantities are summed across recorded medicine batches."
 )
 
 
-# --------------------------------------------------
-# 14. DISPLAY MEDICINE TRANSFER DETAILS
-# --------------------------------------------------
+# =========================================================
+# 9. SELECT ROUTE
+# =========================================================
 
-st.markdown("### Medicine Transfer Details")
+selected_route = None
 
-if not transfers_available:
-    st.warning(
-        "Medicine transfer details are unavailable. "
-        "Check the CSV file path and column names."
+if routes:
+    selected_route_name = st.selectbox(
+        "Select a redistribution route",
+        [route["name"] for route in routes],
     )
 
-elif not matching_transfers.empty:
-    display_columns = [
-        "drug_id",
-        "drug_name",
-        "from_hospital_name",
-        "to_hospital_name",
-        "transfer_quantity",
-        "transfer_status",
-    ]
-
-    if "recipient_priority" in matching_transfers.columns:
-        display_columns.append("recipient_priority")
-
-    st.dataframe(
-        matching_transfers[display_columns].rename(
-            columns={
-                "drug_id": "Drug ID",
-                "drug_name": "Medicine",
-                "from_hospital_name": "From Hospital",
-                "to_hospital_name": "To Hospital",
-                "transfer_quantity": "Quantity",
-                "transfer_status": "Status",
-                "recipient_priority": "Recipient Priority",
-            }
-        ),
-        use_container_width=True,
-        hide_index=True,
+    selected_route = next(
+        route
+        for route in routes
+        if route["name"] == selected_route_name
     )
 
 else:
     st.warning(
-        "No medicine transfer row matched this route's source and "
-        "destination hospital IDs. The route and medicine plan may "
-        "use different IDs or formats."
+        "No valid route geometry was found. "
+        "Hospitals will still be displayed on the map."
     )
 
 
-# Show the full redistribution plan separately.
-with st.expander("View all proposed medicine transfers"):
-    if transfers_available:
-        display_all = transfers_df.copy()
+# =========================================================
+# 10. MATCH TRANSFERS
+# =========================================================
 
-        display_all = display_all.rename(
-            columns={
-                "drug_id": "Drug ID",
-                "drug_name": "Medicine",
-                "from_hospital": "From Hospital ID",
-                "to_hospital": "To Hospital ID",
-                "from_hospital_name": "From Hospital",
-                "to_hospital_name": "To Hospital",
-                "transfer_quantity": "Quantity",
-                "simulated_distance": "Simulated Distance",
-                "recipient_priority": "Recipient Priority",
-                "transfer_status": "Status",
-                "data_origin": "Data Origin",
-            }
-        )
+matching_transfers = pd.DataFrame()
 
+if selected_route is not None and not transfers_df.empty:
+
+    source_column = find_column(
+        transfers_df,
+        ["from_hospital", "source_hospital", "source"],
+    )
+
+    destination_column = find_column(
+        transfers_df,
+        ["to_hospital", "destination_hospital", "destination"],
+    )
+
+    if source_column and destination_column:
+        source_id = selected_route["source"]
+        destination_id = selected_route["destination"]
+
+        if source_id and destination_id:
+            matching_transfers = transfers_df[
+                (
+                    transfers_df[source_column].astype(str)
+                    == source_id
+                )
+                & (
+                    transfers_df[destination_column].astype(str)
+                    == destination_id
+                )
+            ].copy()
+
+
+# =========================================================
+# 11. HOSPITAL AND TRANSFER TABLES
+# =========================================================
+
+with st.expander("View hospital stock balances", expanded=True):
+    stock_table = pd.DataFrame(hospital_points)[
+        ["id", "name", "total_stock", "usable_stock"]
+    ].rename(
+        columns={
+            "id": "Hospital ID",
+            "name": "Hospital",
+            "total_stock": "Total Recorded Stock",
+            "usable_stock": "Usable Unexpired Stock",
+        }
+    )
+
+    st.dataframe(
+        stock_table,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+with st.expander("View all hospital locations"):
+    st.dataframe(
+        pd.DataFrame(hospital_points),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+with st.expander("View medicine inventory batches"):
+    if inventory_df.empty:
+        st.info("No inventory data was found.")
+    else:
         st.dataframe(
-            display_all,
+            inventory_df,
             use_container_width=True,
             hide_index=True,
         )
 
-        st.caption(
-            "All transfer rows are planning data marked as simulated. "
-            "Simulated distance is shown without a unit because its "
-            "unit has not been verified."
+
+with st.expander("View medicine redistribution records"):
+    if transfers_df.empty:
+        st.info(
+            "No redistribution CSV was found or it contains no rows."
+        )
+    else:
+        st.dataframe(
+            transfers_df,
+            use_container_width=True,
+            hide_index=True,
         )
 
+
+if selected_route is not None:
+    st.markdown("### Selected Route")
+
+    if matching_transfers.empty:
+        st.info(
+            "No transfer records matched this route. "
+            "This does not mean that the route has been approved."
+        )
     else:
-        st.write("No valid redistribution data is available.")
+        st.dataframe(
+            matching_transfers,
+            use_container_width=True,
+            hide_index=True,
+        )
 
 
-# --------------------------------------------------
-# 15. PREPARE HTML DATA
-# --------------------------------------------------
+# =========================================================
+# 12. PREPARE MAP DATA
+# =========================================================
 
 hospitals_json = json.dumps(hospital_points)
-routes_json = json.dumps(all_routes_for_map)
+routes_json = json.dumps(routes)
 
 selected_route_json = json.dumps(
-    {
-        "id": selected_transfer["id"],
-        "label": selected_transfer["label"],
-        "coordinates": selected_coordinates,
-        "duration_seconds": ANIMATION_DURATION_SECONDS,
-    }
+    selected_route if selected_route else {}
 )
 
 
-# --------------------------------------------------
-# 16. HTML MAP WITH SMOOTH VEHICLE ANIMATION
-# --------------------------------------------------
+# =========================================================
+# 13. INTERACTIVE LEAFLET MAP
+# =========================================================
 
 map_html = r"""
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
-    html, body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-    }
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: Arial, sans-serif;
+}
 
-    #map {
-        height: 100%;
-        width: 100%;
-    }
+#map {
+    width: 100%;
+    height: 100%;
+}
 
-    .control-panel {
-        position: absolute;
-        top: 12px;
-        left: 60px;
-        z-index: 1000;
-        background: white;
-        padding: 12px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
-        max-width: 290px;
-    }
+.hospital-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: white;
+    border: 2px solid #9caf88;
+    border-radius: 50%;
+    font-size: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
 
-    .control-panel button {
-        padding: 7px 12px;
-        margin: 5px 3px 0 0;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        background: #1769aa;
-        color: white;
-        font-weight: bold;
-    }
+.vehicle-marker {
+    font-size: 30px;
+    text-align: center;
+    width: 36px;
+    height: 36px;
+}
 
-    .control-panel button:hover {
-        opacity: 0.85;
-    }
+.control-panel {
+    position: absolute;
+    top: 12px;
+    left: 60px;
+    z-index: 1000;
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    max-width: 280px;
+}
 
-    #status {
-        font-size: 13px;
-        margin-top: 8px;
-        color: #333;
-    }
+button {
+    margin-top: 8px;
+    margin-right: 4px;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 5px;
+    background: #9caf88;
+    color: #172313;
+    cursor: pointer;
+    font-weight: bold;
+}
 
-    #progress-container {
-        margin-top: 8px;
-        height: 6px;
-        width: 100%;
-        background: #ddd;
-        border-radius: 5px;
-        overflow: hidden;
-    }
+#status {
+    margin-top: 8px;
+    font-size: 13px;
+}
 
-    #progress {
-        height: 100%;
-        width: 0%;
-        background: #16803c;
-    }
-
-    .hospital-icon {
-        font-size: 24px;
-        text-align: center;
-    }
-
-    .vehicle-icon {
-        font-size: 28px;
-        text-align: center;
-        line-height: 32px;
-        width: 32px;
-        height: 32px;
-        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35));
-    }
-
-    .legend {
-        background: white;
-        padding: 8px 10px;
-        border-radius: 6px;
-        line-height: 1.7;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.2);
-    }
-
-    .legend-line {
-        display: inline-block;
-        width: 20px;
-        height: 4px;
-        background: #2474d2;
-        margin-right: 6px;
-        vertical-align: middle;
-    }
-
-    .legend-selected {
-        background: #e53935;
-    }
+.legend {
+    background: white;
+    padding: 8px;
+    border-radius: 6px;
+    line-height: 1.8;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+}
 </style>
 </head>
 
@@ -769,21 +697,18 @@ map_html = r"""
 <div id="map"></div>
 
 <div class="control-panel">
-    <strong>Vehicle Simulation</strong>
-    <div id="route-name" style="font-size:12px;margin-top:5px;"></div>
+    <strong>🚑 Vehicle Simulation</strong>
+
+    <div id="route-name" style="margin-top:5px;font-size:12px;"></div>
 
     <button onclick="startAnimation()">▶ Start</button>
     <button onclick="pauseAnimation()">⏸ Pause</button>
     <button onclick="resetAnimation()">↺ Reset</button>
 
-    <div id="status">Ready to start</div>
-
-    <div id="progress-container">
-        <div id="progress"></div>
-    </div>
+    <div id="status">Ready</div>
 
     <div style="font-size:11px;color:#555;margin-top:6px;">
-        Accelerated simulation: 30 seconds per journey
+        Demonstration simulation — not live tracking.
     </div>
 </div>
 
@@ -793,22 +718,18 @@ const routes = ROUTE_DATA;
 const selectedRoute = SELECTED_DATA;
 
 function escapeHTML(value) {
-    return String(value).replace(/[&<>"']/g, function(character) {
-        const replacements = {
+    return String(value).replace(/[&<>"']/g, function(c) {
+        return {
             "&": "&amp;",
             "<": "&lt;",
             ">": "&gt;",
             '"': "&quot;",
             "'": "&#039;"
-        };
-        return replacements[character];
+        }[c];
     });
 }
 
-const map = L.map("map", {
-    zoomControl: true,
-    preferCanvas: true
-});
+const map = L.map("map");
 
 L.tileLayer(
     "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -819,290 +740,272 @@ L.tileLayer(
 ).addTo(map);
 
 
-// Hospital markers.
+// ---------------------------------------------------------
+// HOSPITAL MARKERS WITH STOCK BALANCE
+// ---------------------------------------------------------
+
 const hospitalIcon = L.divIcon({
-    className: "hospital-icon",
-    html: "",
-    iconSize: [28, 28],
-    iconAnchor: [14, 14]
+    className: "",
+    html: '<div class="hospital-marker">🏥</div>',
+    iconSize: [42, 42],
+    iconAnchor: [21, 21]
 });
 
 const hospitalBounds = [];
 
 hospitals.forEach(function(hospital) {
-    const position = [hospital.lat, hospital.lon];
+    const position = [
+        Number(hospital.lat),
+        Number(hospital.lon)
+    ];
+
+    if (
+        !Number.isFinite(position[0]) ||
+        !Number.isFinite(position[1])
+    ) {
+        return;
+    }
+
     hospitalBounds.push(position);
+
+    const totalStock = Number(hospital.total_stock || 0);
+    const usableStock = Number(hospital.usable_stock || 0);
 
     L.marker(position, {
         icon: hospitalIcon
     })
     .addTo(map)
     .bindPopup(
-        "<b>" + escapeHTML(hospital.name) + "</b><br>" +
-        "Hospital ID: " + escapeHTML(hospital.id)
+        "<strong>" + escapeHTML(hospital.name) + "</strong><br>" +
+        "Hospital ID: " + escapeHTML(hospital.id) + "<br>" +
+        "Total recorded stock: " + totalStock.toLocaleString() +
+        " units<br>" +
+        "Usable, unexpired stock: " + usableStock.toLocaleString() +
+        " units<br>" +
+        "Location: " +
+        position[0].toFixed(5) + ", " +
+        position[1].toFixed(5)
     );
 });
 
 
-// Draw all routes.
+// ---------------------------------------------------------
+// ROUTES
+// ---------------------------------------------------------
+
 routes.forEach(function(route) {
     const isSelected =
+        selectedRoute &&
         String(route.id) === String(selectedRoute.id);
 
     L.polyline(route.coordinates, {
-        color: isSelected ? "#e53935" : "#2474d2",
-        weight: isSelected ? 5 : 2,
-        opacity: isSelected ? 0.95 : 0.35
-    }).addTo(map);
+        color: isSelected ? "#cc5500" : "#2474d2",
+        weight: isSelected ? 5 : 3,
+        opacity: isSelected ? 0.95 : 0.45
+    })
+    .addTo(map)
+    .bindPopup(escapeHTML(route.name));
 });
 
 
-// Fit the map to routes and hospitals.
-let allBounds = [...hospitalBounds];
+// ---------------------------------------------------------
+// MAP BOUNDS
+// ---------------------------------------------------------
+
+let bounds = [...hospitalBounds];
 
 routes.forEach(function(route) {
     if (Array.isArray(route.coordinates)) {
-        allBounds = allBounds.concat(route.coordinates);
+        bounds = bounds.concat(route.coordinates);
     }
 });
 
-if (allBounds.length > 0) {
-    map.fitBounds(allBounds, {
-        padding: [30, 30],
-        maxZoom: 13
+if (bounds.length > 0) {
+    map.fitBounds(bounds, {
+        padding: [35, 35],
+        maxZoom: 14
     });
+} else {
+    map.setView([20.5937, 78.9629], 5);
 }
 
 
-// Vehicle marker.
-const vehicleIcon = L.divIcon({
-    className: "vehicle-icon",
-    html: "🚑",
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
-});
+// ---------------------------------------------------------
+// VEHICLE ANIMATION
+// ---------------------------------------------------------
 
-const coordinates = selectedRoute.coordinates;
-
-const vehicle = L.marker(coordinates[0], {
-    icon: vehicleIcon,
-    zIndexOffset: 1000
-}).addTo(map);
-
-vehicle.bindPopup("Simulated redistribution vehicle");
-
-document.getElementById("route-name").textContent =
-    selectedRoute.label;
-
-
-// Calculate distances between route points.
-function haversineDistance(a, b) {
-    const earthRadius = 6371000;
-
-    const lat1 = a[0] * Math.PI / 180;
-    const lat2 = b[0] * Math.PI / 180;
-
-    const deltaLat = (b[0] - a[0]) * Math.PI / 180;
-    const deltaLon = (b[1] - a[1]) * Math.PI / 180;
-
-    const value =
-        Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-        Math.cos(lat1) * Math.cos(lat2) *
-        Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
-
-    return earthRadius * 2 * Math.atan2(
-        Math.sqrt(value),
-        Math.sqrt(Math.max(0, 1 - value))
-    );
-}
-
-const cumulativeDistances = [0];
-
-for (let i = 1; i < coordinates.length; i++) {
-    cumulativeDistances.push(
-        cumulativeDistances[i - 1] +
-        haversineDistance(coordinates[i - 1], coordinates[i])
-    );
-}
-
-const totalDistance =
-    cumulativeDistances[cumulativeDistances.length - 1];
-
-
-function positionAt(progress) {
-    if (progress <= 0) {
-        return coordinates[0];
-    }
-
-    if (progress >= 1) {
-        return coordinates[coordinates.length - 1];
-    }
-
-    const targetDistance = progress * totalDistance;
-
-    let index = 1;
-
-    while (
-        index < cumulativeDistances.length - 1 &&
-        cumulativeDistances[index] < targetDistance
-    ) {
-        index++;
-    }
-
-    const previousDistance = cumulativeDistances[index - 1];
-    const nextDistance = cumulativeDistances[index];
-
-    const segmentLength = nextDistance - previousDistance;
-
-    const segmentProgress = segmentLength > 0
-        ? (targetDistance - previousDistance) / segmentLength
-        : 0;
-
-    const start = coordinates[index - 1];
-    const end = coordinates[index];
-
-    return [
-        start[0] + (end[0] - start[0]) * segmentProgress,
-        start[1] + (end[1] - start[1]) * segmentProgress
-    ];
-}
-
-
-// Smooth 30-second animation.
+let vehicle = null;
 let animationFrame = null;
-let animationRunning = false;
-let startTimestamp = null;
-let elapsedBeforePause = 0;
+let running = false;
+let startTime = null;
+let elapsed = 0;
 
-const durationMilliseconds =
-    selectedRoute.duration_seconds * 1000;
+const duration = 30000;
 
 const statusElement = document.getElementById("status");
-const progressElement = document.getElementById("progress");
 
+if (
+    selectedRoute &&
+    selectedRoute.coordinates &&
+    selectedRoute.coordinates.length >= 2
+) {
+    const coordinates = selectedRoute.coordinates;
 
-function renderProgress(progress) {
-    const safeProgress = Math.max(0, Math.min(1, progress));
+    const vehicleIcon = L.divIcon({
+        className: "",
+        html: '<div class="vehicle-marker">🚑</div>',
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+    });
 
-    vehicle.setLatLng(positionAt(safeProgress));
+    vehicle = L.marker(coordinates[0], {
+        icon: vehicleIcon,
+        zIndexOffset: 1000
+    }).addTo(map);
 
-    progressElement.style.width =
-        (safeProgress * 100).toFixed(2) + "%";
+    vehicle.bindPopup("Simulated redistribution vehicle");
 
-    statusElement.textContent =
-        "Progress: " + Math.round(safeProgress * 100) + "%";
-}
+    document.getElementById("route-name").textContent =
+        selectedRoute.name;
 
+    function positionAt(progress) {
+        const scaled = progress * (coordinates.length - 1);
 
-function animate(timestamp) {
-    if (!animationRunning) {
-        return;
+        const index = Math.min(
+            Math.floor(scaled),
+            coordinates.length - 2
+        );
+
+        const fraction = scaled - index;
+
+        const start = coordinates[index];
+        const end = coordinates[index + 1];
+
+        return [
+            start[0] + (end[0] - start[0]) * fraction,
+            start[1] + (end[1] - start[1]) * fraction
+        ];
     }
 
-    if (startTimestamp === null) {
-        startTimestamp = timestamp - elapsedBeforePause;
-    }
+    function animate(timestamp) {
+        if (!running) {
+            return;
+        }
 
-    const elapsed = timestamp - startTimestamp;
+        if (startTime === null) {
+            startTime = timestamp;
+        }
 
-    const progress = Math.min(
-        elapsed / durationMilliseconds,
-        1
-    );
+        const currentElapsed = elapsed + timestamp - startTime;
 
-    renderProgress(progress);
+        const progress = Math.min(
+            currentElapsed / duration,
+            1
+        );
 
-    if (progress >= 1) {
-        animationRunning = false;
-        animationFrame = null;
-        elapsedBeforePause = durationMilliseconds;
+        vehicle.setLatLng(positionAt(progress));
 
         statusElement.textContent =
-            "Journey completed — accelerated simulation.";
+            "Simulation progress: " +
+            Math.round(progress * 100) + "%";
 
-        return;
+        if (progress >= 1) {
+            running = false;
+            elapsed = 0;
+            startTime = null;
+
+            statusElement.textContent =
+                "Journey simulation completed";
+
+            return;
+        }
+
+        animationFrame = requestAnimationFrame(animate);
     }
 
-    animationFrame = requestAnimationFrame(animate);
+    window.startAnimation = function() {
+        if (running) {
+            return;
+        }
+
+        if (elapsed >= duration) {
+            elapsed = 0;
+        }
+
+        running = true;
+        startTime = null;
+
+        animationFrame = requestAnimationFrame(animate);
+    };
+
+    window.pauseAnimation = function() {
+        if (!running) {
+            return;
+        }
+
+        running = false;
+
+        if (startTime !== null) {
+            elapsed += performance.now() - startTime;
+        }
+
+        startTime = null;
+
+        if (animationFrame !== null) {
+            cancelAnimationFrame(animationFrame);
+        }
+
+        statusElement.textContent = "Simulation paused";
+    };
+
+    window.resetAnimation = function() {
+        running = false;
+
+        if (animationFrame !== null) {
+            cancelAnimationFrame(animationFrame);
+        }
+
+        elapsed = 0;
+        startTime = null;
+
+        vehicle.setLatLng(coordinates[0]);
+
+        statusElement.textContent = "Ready to start";
+    };
+
+} else {
+    document.getElementById("route-name").textContent =
+        "No valid route selected";
+
+    statusElement.textContent =
+        "Hospital map ready; vehicle route unavailable";
+
+    window.startAnimation = function() {};
+    window.pauseAnimation = function() {};
+    window.resetAnimation = function() {};
 }
 
 
-function startAnimation() {
-    if (animationRunning) {
-        return;
-    }
+// ---------------------------------------------------------
+// LEGEND
+// ---------------------------------------------------------
 
-    if (elapsedBeforePause >= durationMilliseconds) {
-        resetAnimation();
-    }
-
-    animationRunning = true;
-    startTimestamp = null;
-
-    statusElement.textContent = "Vehicle moving...";
-
-    animationFrame = requestAnimationFrame(animate);
-}
-
-
-function pauseAnimation() {
-    if (!animationRunning) {
-        return;
-    }
-
-    animationRunning = false;
-
-    if (animationFrame !== null) {
-        cancelAnimationFrame(animationFrame);
-        animationFrame = null;
-    }
-
-    if (startTimestamp !== null) {
-        elapsedBeforePause = Math.min(
-            performance.now() - startTimestamp,
-            durationMilliseconds
-        );
-    }
-
-    statusElement.textContent = "Animation paused.";
-}
-
-
-function resetAnimation() {
-    animationRunning = false;
-
-    if (animationFrame !== null) {
-        cancelAnimationFrame(animationFrame);
-        animationFrame = null;
-    }
-
-    startTimestamp = null;
-    elapsedBeforePause = 0;
-
-    renderProgress(0);
-
-    statusElement.textContent = "Ready to start.";
-}
-
-
-// Map legend.
-const legend = L.control({ position: "bottomright" });
+const legend = L.control({position: "bottomright"});
 
 legend.onAdd = function() {
     const div = L.DomUtil.create("div", "legend");
 
     div.innerHTML =
-        '<span class="legend-line legend-selected"></span> Selected route<br>' +
-        '<span class="legend-line"></span> Other routes<br>' +
-        'Hospital<br>' +
-        'Simulated vehicle';
+        "<strong>Map Legend</strong><br>" +
+        "🏥 Hospital location<br>" +
+        "🚑 Simulated vehicle<br>" +
+        '<span style="color:#cc5500;">━━</span> Selected route<br>' +
+        '<span style="color:#2474d2;">━━</span> Other routes';
 
     return div;
 };
 
 legend.addTo(map);
-
-renderProgress(0);
 
 </script>
 
@@ -1118,24 +1021,19 @@ map_html = (
 )
 
 
-# --------------------------------------------------
-# 17. RENDER MAP
-# --------------------------------------------------
+# =========================================================
+# 14. DISPLAY MAP
+# =========================================================
 
-st.markdown("### Vehicle Movement Simulation")
+st.markdown("### Interactive Hospital Network")
 
 st.caption(
-    "Select a journey above, then use Start, Pause, or Reset on the map. "
-    "The vehicle animation takes 30 seconds per complete journey."
+    "Click a hospital marker to view its name, ID, and stock balance. "
+    "Select a route above to view its simulated vehicle journey."
 )
 
 components.html(
     map_html,
-    height=710,
+    height=650,
     scrolling=False,
-)
-
-st.caption(
-    "This is a browser-based simulation. It does not represent live "
-    "vehicle tracking, live traffic, or a verified real-world delivery."
 )

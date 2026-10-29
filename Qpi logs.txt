@@ -1,0 +1,117 @@
+{
+    "timestamp": "2026-10-29T12:12:59.902477",
+    "status": "SUCCESS",
+    "optimizer_engine": "QpiAI Opt API (Pure Python)",
+    "total_inventory_scanned": 102,
+    "total_transfers_optimized": 15,
+    "safety_firewall_status": "PASSED",
+    "compliance": "Zero-waste verified"
+}
+
+{
+    "timestamp": "2026-10-29T12:50:07.212218",
+    "status": "SUCCESS",
+    "optimizer_engine": "QpiAI Opt API (Dynamic Routing)",
+    "total_transfers_optimized": 20,
+    "safety_firewall_status": "PASSED"
+}
+
+{
+    "timestamp": "2026-10-29T15:00:41.164099",
+    "status": "SUCCESS",
+    "optimizer_engine": "QpiAI Opt API (Dynamic Routing)",
+    "total_transfers_optimized": 20,
+    "safety_firewall_status": "PASSED"
+}
+{
+  "run_id": "d388de627ffa435e96ccf632f8f42a58",
+  "timestamp_utc": "2026-10-29T18:27:29.307851+00:00",
+  "status": "SUCCESS",
+  "method": "baseline_candidate_generation",
+  "qpiai_solver_called": false,
+  "valid_batches": 33,
+  "rejected_batches": 69,
+  "candidate_transfers": 297,
+  "errors": [],
+  "message": "Candidate transfers generated. QpiAI was not called, and no transfer is approved."
+}
+
+{
+  "request_id": "3a8a97a5161542cba81d957350c6cd4b",
+  "timestamp_utc": "2026-10-29T21:25:31.945975+00:00",
+  "endpoint": "https://opt-server.qpiai.tech/api/problems/create",
+  "status_code": 201,
+  "success": true,
+  "response": {
+    "id": "83789bf7-196f-4236-84d1-b347a6ecf1dd",
+    "name": "MediResQ AI QUBO Test",
+    "method": "QUBO",
+    "max_evaluations": 1000,
+    "user_id": "f61a6a62-5933-4255-85d4-a67fe0c8c8e0",
+    "organization_id": "29447676-a2e2-4604-8881-862077447410",
+    "created_at": "2026-10-29T21:25:32.379440622Z",
+    "updated_at": "2026-10-29T21:25:32.379440622Z",
+    "deleted_at": null,
+    "num_variables": 3,
+    "qubo_dict_id": "6ae3b9ccd9abf82da0017914",
+    "solver_config_id": "6ae3b9ccd9abf82da0017915",
+    "jobs_count": 0,
+    "experiments_count": 0
+  }
+}
+
+{
+  "request_id": "12a883b653ec41e2ba64985cdb9c85d4",
+  "timestamp_utc": "2026-10-29T20:02:33.540537+00:00",
+  "api_url": "https://opt-server.qpiai.tech/api",
+  "status_code": 404,
+  "success": false,
+  "response": {
+    "message": "Route not found",
+    "status": "error"
+  },
+  "error": "QpiAI API returned HTTP 404. Response: {'message': 'Route not found', 'status': 'error'}"
+}
+
+{
+  "request_id": "48fe4522f85849e8a014d8e7010c5bf5",
+  "timestamp_utc": "2026-10-29T18:59:48.147841+00:00",
+  "api_url": "https://opt-server.qpiai.tech/api",
+  "status_code": 404,
+  "success": false,
+  "response": {
+    "message": "Route not found",
+    "status": "error"
+  },
+  "error": "QpiAI API returned HTTP 404. Response: {'message': 'Route not found', 'status': 'error'}"
+}
+
+{
+  "request_id": "58666b89f6b84269a3f50051f746be15",
+  "timestamp_utc": "2026-10-29T18:59:48.291020+00:00",
+  "api_url": "https://opt-server.qpiai.tech/api",
+  "status_code": 404,
+  "success": false,
+  "response": {
+    "message": "Route not found",
+    "status": "error"
+  },
+  "error": "QpiAI API returned HTTP 404. Response: {'message': 'Route not found', 'status': 'error'}"
+}
+
+{
+    "status_code": 503,
+    "response": {
+        "error": "HTTPSConnectionPool(host='api.qpial.com', port=443): Max retries exceeded with url: /v1/optimize (Caused by NameResolutionError(\"HTTPSConnection(host='api.qpial.com', port=443): Failed to resolve 'api.qpial.com' ([Errno 11001] getaddrinfo failed)\"))"
+    }
+}
+
+{
+    "status_code": 503,
+    "response": {
+        "error": "HTTPSConnectionPool(host='api.qpial.com', port=443): Max retries exceeded with url: /v1/optimize (Caused by NameResolutionError(\"HTTPSConnection(host='api.qpial.com', port=443): Failed to resolve 'api.qpial.com' ([Errno 11001] getaddrinfo failed)\"))"
+    }
+}
+
+QpiAI problem creation successful!
+Actual response: {'id': '83789bf7-196f-4236-84d1-b347a6ecf1dd', 'name': 'MediResQ AI QUBO Test', 'method': 'QUBO', 'max_evaluations': 1000, 'user_id': 'f61a6a62-5933-4255-85d4-a67fe0c8c8e0', 'organization_id': '29447676-a2e2-4604-8881-862077447410', 'created_at': '2026-10-29T21:25:32.379440622Z', 'updated_at': '2026-10-29T21:25:32.379440622Z', 'deleted_at': None, 'num_variables': 3, 'qubo_dict_id': '6ae3b9ccd9abf82da0017914', 'solver_config_id': '6ae3b9ccd9abf82da0017915', 'jobs_count': 0, 'experiments_count': 0}

@@ -1,21 +1,32 @@
-Batch ID,Drug Name,From,To,Quantity,Storage,Expiry,Status
-SIM-BATCH-0002,Amoxicillin,H001,H004,50,Ambient,2027-04-14,Optimized & Verified
-SIM-BATCH-0009,Diazepam,H002,H005,50,Ambient,2027-06-16,Optimized & Verified
-SIM-BATCH-0013,ORS Sachets,H001,H006,50,Ambient,2027-06-26,Optimized & Verified
-SIM-BATCH-0014,Doxycycline,H002,H007,50,Ambient,2027-11-19,Optimized & Verified
-SIM-BATCH-0016,Amlodipine,H004,H008,50,Ambient,2027-08-20,Optimized & Verified
-SIM-BATCH-0023,Lumefantrine,H007,H009,50,Ambient,2026-11-25,Optimized & Verified
-SIM-BATCH-0028,Ceftriaxone,H001,H010,50,Ambient,2027-07-03,Optimized & Verified
-SIM-BATCH-0031,Morphine,H006,H001,50,Ambient,2027-11-13,Optimized & Verified
-SIM-BATCH-0032,Tramadol,H005,H002,50,Ambient,2027-07-16,Optimized & Verified
-SIM-BATCH-0033,Codeine,H003,H005,50,Ambient,2026-10-31,Optimized & Verified
-SIM-BATCH-0034,Aspirin,H004,H006,50,Ambient,2027-07-14,Optimized & Verified
-SIM-BATCH-0035,Diclofenac,H006,H005,50,Ambient,2027-11-17,Optimized & Verified
-SIM-BATCH-0036,Naproxen,H002,H006,50,Ambient,2027-12-26,Optimized & Verified
-SIM-BATCH-0039,Betamethasone,H002,H007,50,Ambient,2027-08-17,Optimized & Verified
-SIM-BATCH-0040,Salbutamol,H006,H008,50,Ambient,2027-03-22,Optimized & Verified
-SIM-BATCH-0043,Insulin Regular,H005,H009,50,Ambient,2027-06-09,Optimized & Verified
-SIM-BATCH-0052,Warfarin,H010,H002,50,Ambient,2027-10-14,Optimized & Verified
-SIM-BATCH-0060,Loperamide,H002,H001,50,Ambient,2027-09-22,Optimized & Verified
-SIM-BATCH-0061,Oral Morphine,H004,H002,50,Ambient,2027-12-16,Optimized & Verified
-SIM-BATCH-0062,Pethidine,H002,H003,50,Ambient,2027-02-10,Optimized & Verified
+Batch ID,Drug ID,Drug Name,Source Hospital,Destination Hospital,Proposed Quantity,Expiry Date,Storage Requirement,Source Data Origin,Destination 7-Day Demand,Destination Demand Remaining Before,Status
+SIM-BATCH-0002,DRG002,Amoxicillin,H001,H002,49,2027-04-14,NORMAL,PROVIDED_DATASET,49,49,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0002,DRG002,Amoxicillin,H001,H003,69,2027-04-14,NORMAL,PROVIDED_DATASET,266,266,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0013,DRG013,ORS Sachets,H001,H002,86,2027-06-26,NORMAL,PROVIDED_DATASET,252,252,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0014,DRG014,Doxycycline,H002,H001,24,2027-11-19,NORMAL,PROVIDED_DATASET,49,49,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0023,DRG023,Lumefantrine,H007,H001,119,2026-11-25,COLD_CHAIN,PROVIDED_DATASET,119,119,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0023,DRG023,Lumefantrine,H007,H002,128,2026-11-25,COLD_CHAIN,PROVIDED_DATASET,147,147,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0028,DRG028,Ceftriaxone,H001,H002,196,2027-07-03,NORMAL,PROVIDED_DATASET,196,196,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0028,DRG028,Ceftriaxone,H001,H003,47,2027-07-03,NORMAL,PROVIDED_DATASET,133,133,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0031,DRG031,Morphine,H006,H001,91,2027-11-13,NORMAL,PROVIDED_DATASET,294,294,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0033,DRG033,Codeine,H003,H001,35,2026-10-31,NORMAL,PROVIDED_DATASET,35,35,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0033,DRG033,Codeine,H003,H002,70,2026-10-31,NORMAL,PROVIDED_DATASET,70,70,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0033,DRG033,Codeine,H003,H004,296,2026-10-31,NORMAL,PROVIDED_DATASET,336,336,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0034,DRG034,Aspirin,H004,H001,105,2027-07-14,NORMAL,PROVIDED_DATASET,105,105,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0034,DRG034,Aspirin,H004,H002,44,2027-07-14,NORMAL,PROVIDED_DATASET,56,56,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0036,DRG036,Naproxen,H002,H001,224,2027-12-26,NORMAL,PROVIDED_DATASET,224,224,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0036,DRG036,Naproxen,H002,H003,31,2027-12-26,NORMAL,PROVIDED_DATASET,49,49,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0039,DRG039,Betamethasone,H002,H001,98,2027-08-17,NORMAL,PROVIDED_DATASET,98,98,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0039,DRG039,Betamethasone,H002,H003,24,2027-08-17,NORMAL,PROVIDED_DATASET,259,259,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0043,DRG043,Insulin Regular,H005,H001,52,2027-06-09,COLD_CHAIN,PROVIDED_DATASET,70,70,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0052,DRG052,Warfarin,H010,H001,80,2027-10-14,NORMAL,PROVIDED_DATASET,273,273,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0067,DRG067,Haloperidol,H003,H001,70,2026-12-30,NORMAL,PROVIDED_DATASET,133,133,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0069,DRG069,Amitriptyline,H006,H001,70,2027-01-16,NORMAL,PROVIDED_DATASET,70,70,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0069,DRG069,Amitriptyline,H006,H002,121,2027-01-16,NORMAL,PROVIDED_DATASET,315,315,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0076,DRG076,Vitamin A,H004,H001,196,2027-07-10,NORMAL,PROVIDED_DATASET,196,196,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0076,DRG076,Vitamin A,H004,H002,66,2027-07-10,NORMAL,PROVIDED_DATASET,196,196,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0078,DRG078,Iron Sulphate,H008,H001,59,2027-09-11,NORMAL,PROVIDED_DATASET,196,196,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0083,DRG083,Misoprostol,H006,H001,296,2027-03-02,NORMAL,PROVIDED_DATASET,343,343,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0094,DRG094,Sulfadoxine-Pyrimethamine,H004,H001,56,2027-01-18,NORMAL,PROVIDED_DATASET,203,203,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0100,DRG100,Streptomycin,H003,H001,214,2027-07-13,COLD_CHAIN,PROVIDED_DATASET,336,336,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0101,DRG101,BCG Vaccine,H004,H001,175,2027-10-18,NORMAL,PROVIDED_DATASET,175,175,"Candidate - Stock, Unmet Demand and Safety Validation Required"
+SIM-BATCH-0101,DRG101,BCG Vaccine,H004,H002,12,2027-10-18,NORMAL,PROVIDED_DATASET,280,280,"Candidate - Stock, Unmet Demand and Safety Validation Required"

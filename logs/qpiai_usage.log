@@ -1,0 +1,28 @@
+2026-10-30 02:42:58,836 | INFO | {"timestamp": "2026-10-29T21:12:58.836750+00:00", "event": "dispatch_request_received", "details": {"input": {"medicine": "Amoxicillin", "quantity": 10, "source": "H001", "destination": "H002", "storage_requirement": "NORMAL", "expiry_date": null}}}
+2026-10-30 02:42:58,837 | INFO | {"timestamp": "2026-10-29T21:12:58.837036+00:00", "event": "dispatch_validation", "details": {"result": "request_format_valid", "note": "This does not prove inventory feasibility or safety."}}
+2026-10-30 02:42:58,837 | INFO | {"timestamp": "2026-10-29T21:12:58.837116+00:00", "event": "optimization_not_run", "details": {"solver": "QpiAI", "status": "NOT_EXECUTED", "reason": "This endpoint currently records the request only. No QpiAI solver call is implemented here."}}
+2026-10-30 02:48:57,572 | INFO | {"timestamp": "2026-10-29T21:18:57.571930+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 02:49:02,698 | INFO | {"timestamp": "2026-10-29T21:19:02.698443+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 02:57:42,863 | INFO | {"timestamp": "2026-10-29T21:27:42.863662+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 02:59:43,628 | INFO | {"timestamp": "2026-10-29T21:29:43.628503+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:01:54,942 | INFO | {"timestamp": "2026-10-29T21:31:54.941742+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:13:12,240 | INFO | {"timestamp": "2026-10-29T21:43:12.239935+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:14:02,705 | INFO | {"timestamp": "2026-10-29T21:44:02.705603+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:22:50,546 | INFO | {"timestamp": "2026-10-29T21:52:50.546399+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:28:15,138 | INFO | {"timestamp": "2026-10-29T21:58:15.138849+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:29:00,706 | INFO | {"timestamp": "2026-10-29T21:59:00.706652+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:43:22,393 | INFO | {"timestamp": "2026-10-29T22:13:22.393381+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:45:02,646 | INFO | {"timestamp": "2026-10-29T22:15:02.646755+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:45:23,146 | INFO | {"timestamp": "2026-10-29T22:15:23.146216+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:56:42,172 | INFO | {"timestamp": "2026-10-29T22:26:42.171924+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:58:36,646 | INFO | {"timestamp": "2026-10-29T22:28:36.646621+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:59:26,266 | INFO | {"timestamp": "2026-10-29T22:29:26.266293+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:59:32,117 | INFO | {"timestamp": "2026-10-29T22:29:32.117260+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 03:59:50,537 | INFO | {"timestamp": "2026-10-29T22:29:50.537570+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 04:01:38,157 | INFO | {"timestamp": "2026-10-29T22:31:38.157058+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 04:01:52,563 | INFO | {"timestamp": "2026-10-29T22:31:52.563612+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 04:03:11,181 | INFO | {"timestamp": "2026-10-29T22:33:11.180946+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 04:03:11,225 | INFO | {"timestamp": "2026-10-29T22:33:11.224923+00:00", "event": "inventory_loaded", "details": {"record_count": 102}}
+2026-10-30 04:04:34,969 | INFO | {"timestamp": "2026-10-29T22:34:34.969067+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 04:04:44,923 | INFO | {"timestamp": "2026-10-29T22:34:44.923426+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}
+2026-10-30 04:11:53,575 | INFO | {"timestamp": "2026-10-29T22:41:53.575416+00:00", "event": "hospitals_loaded", "details": {"record_count": 10}}

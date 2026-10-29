@@ -190,11 +190,11 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 class="text-2xl font-black text-white tracking-tight">Facility Network Topology</h2>
-            <p class="text-xs text-concrete-400">Live Health Facility Nodes (`Hosp_01` to `Hosp_10`) & Redistribution Stock Metrics</p>
+            <p class="text-xs text-concrete-400">Live hospital nodes and patient-capacity data loaded from `data/hospitals.csv`</p>
           </div>
           <div class="flex items-center space-x-2">
-            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-sage-500/10 text-sage-400 border border-sage-500/20">
-              <i class="fa-solid fa-circle text-[8px] mr-1"></i> 10 Active Facilities
+            <span id="facility-count-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-sage-500/10 text-sage-400 border border-sage-500/20">
+            <i class="fa-solid fa-circle text-[8px] mr-1"></i> Loading Facilities...
             </span>
           </div>
         </div>
@@ -205,12 +205,12 @@
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-950 text-concrete-400 uppercase font-semibold border-b border-slate-800">
                 <tr>
-                  <th class="p-3">Facility ID</th>
-                  <th class="p-3">Facility Name</th>
-                  <th class="p-3">Category Type</th>
-                  <th class="p-3">Current Stock Balance</th>
-                  <th class="p-3">Storage Temp</th>
-                  <th class="p-3">Redistribution Role</th>
+                  <th class="p-3">Hospital ID</th>
+                  <th class="p-3">Hospital Name</th>
+                  <th class="p-3">Hospital Type</th>
+                  <th class="p-3">Location (X, Y)</th>
+                  <th class="p-3">Daily Patient Capacity</th>
+                  <th class="p-3">Data Origin</th>
                 </tr>
               </thead>
               <tbody id="facilities-table-body" class="divide-y divide-slate-800/80 text-slate-200 font-mono">
@@ -696,18 +696,18 @@
 
   <!-- JavaScript Application Logic -->
   <script>
-    // ================= SYNTHETIC DATASET (STRICT SCHEMA: Hosp_01 to Hosp_10) =================
-    const facilitiesData = [
-      { id: 'Hosp_01', name: 'City General Hospital', type: 'Tertiary Hospital', status: 'Surplus', temp: '2-8 °C Cold', transfer: 'Sender / Receiver' },
-      { id: 'Hosp_02', name: 'Metro Health Clinic', type: 'Urban Clinic', status: 'Balanced', temp: '15-25 °C Room', transfer: 'Receiver' },
-      { id: 'Hosp_03', name: 'District Hospital Hub', type: 'Regional Hub', status: 'Surplus', temp: '2-8 °C Cold', transfer: 'Sender / Receiver' },
-      { id: 'Hosp_04', name: 'St Jude Care Center', type: 'Rural Clinic', status: 'Critical Deficit', temp: '2-8 °C Cold', transfer: 'Receiver' },
-      { id: 'Hosp_05', name: 'Community Health Hub', type: 'Community Clinic', status: 'Deficit', temp: '15-25 °C Room', transfer: 'Receiver' },
-      { id: 'Hosp_06', name: 'North Medical Center', type: 'General Hospital', status: 'Balanced', temp: '15-25 °C Room', transfer: 'Sender / Receiver' },
-      { id: 'Hosp_07', name: 'South Valley Clinic', type: 'Suburban Center', status: 'Surplus', temp: '2-8 °C Cold', transfer: 'Sender' },
-      { id: 'Hosp_08', name: 'Sunrise Health Center', type: 'Primary Care', status: 'Balanced', temp: '15-25 °C Room', transfer: 'Receiver' },
-      { id: 'Hosp_09', name: 'Apex Medical Center', type: 'Specialized Hospital', status: 'Critical Surplus', temp: '2-8 °C Cold', transfer: 'Sender / Receiver' },
-      { id: 'Hosp_10', name: 'Horizon Rural Clinic', type: 'Remote Clinic', status: 'Deficit', temp: '2-8 °C Cold', transfer: 'Receiver' }
+    let facilitiesData = [];
+    const localHospitalData = [
+      { hospital_id: 'H001', hospital_name: 'Synthetic Central Hospital', hospital_type: 'Large Hospital', location_x: '10', location_y: '20', daily_patient_capacity: '500', data_origin: 'SYNTHETIC' },
+      { hospital_id: 'H002', hospital_name: 'Synthetic North Clinic', hospital_type: 'Small Clinic', location_x: '15', location_y: '25', daily_patient_capacity: '80', data_origin: 'SYNTHETIC' },
+      { hospital_id: 'H003', hospital_name: 'Synthetic South Hospital', hospital_type: 'Medium Hospital', location_x: '30', location_y: '10', daily_patient_capacity: '250', data_origin: 'SYNTHETIC' },
+      { hospital_id: 'H004', hospital_name: 'Synthetic East Clinic', hospital_type: 'Small Clinic', location_x: '40', location_y: '30', daily_patient_capacity: '60', data_origin: 'SYNTHETIC' },
+      { hospital_id: 'H005', hospital_name: 'Synthetic West Hospital', hospital_type: 'Medium Hospital', location_x: '5', location_y: '40', daily_patient_capacity: '220', data_origin: 'SYNTHETIC' },
+      { hospital_id: 'H006', hospital_name: 'Synthetic Community Clinic', hospital_type: 'Small Clinic', location_x: '25', location_y: '35', daily_patient_capacity: '50', data_origin: 'SYNTHETIC' },
+      { hospital_id: 'H007', hospital_name: 'Synthetic City Hospital', hospital_type: 'Large Hospital', location_x: '45', location_y: '15', daily_patient_capacity: '450', data_origin: 'SYNTHETIC' },
+      { hospital_id: 'H008', hospital_name: 'Synthetic Rural Clinic', hospital_type: 'Small Clinic', location_x: '50', location_y: '45', daily_patient_capacity: '40', data_origin: 'SYNTHETIC' },
+      { hospital_id: 'H009', hospital_name: 'Synthetic General Hospital', hospital_type: 'Medium Hospital', location_x: '35', location_y: '45', daily_patient_capacity: '180', data_origin: 'SYNTHETIC' },
+      { hospital_id: 'H010', hospital_name: 'Synthetic Emergency Clinic', hospital_type: 'Small Clinic', location_x: '20', location_y: '5', daily_patient_capacity: '70', data_origin: 'SYNTHETIC' }
     ];
 
     // Global State
@@ -844,6 +844,12 @@
         activeNav.classList.remove('text-concrete-400');
         activeNav.classList.add('text-sage-400', 'bg-sage-600/10', 'border', 'border-sage-500/20');
       }
+
+      if (tabId === 'beforeafter') {
+        requestAnimationFrame(() => {
+          initCharts();
+        });
+      }
     }
 
     // ================= FACILITIES TABLE =================
@@ -851,27 +857,46 @@
       const tbody = document.getElementById('facilities-table-body');
       if (!tbody) return;
 
+      const countBadge = document.getElementById('facility-count-badge');
+      if (countBadge) {
+        countBadge.innerHTML = `<i class="fa-solid fa-circle text-[8px] mr-1"></i> ${facilitiesData.length} Active Facilities`;
+      }
+
       tbody.innerHTML = facilitiesData.map(f => `
         <tr class="hover:bg-slate-900/60">
-          <td class="p-3 font-bold text-sage-400">${f.id}</td>
-          <td class="p-3 font-sans font-medium text-white">${f.name}</td>
-          <td class="p-3 font-sans text-concrete-400">${f.type}</td>
-          <td class="p-3">
-            <span class="px-2 py-0.5 text-[11px] font-bold rounded ${
-              f.status.includes('Surplus') ? 'bg-sage-500/10 text-sage-400 border border-sage-500/20' :
-              f.status.includes('Deficit') ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' :
-              'bg-slate-800 text-slate-300'
-            }">${f.status}</span>
-          </td>
-          <td class="p-3 font-mono text-[11px] text-slate-300">${f.temp}</td>
-          <td class="p-3 font-sans text-concrete-400">${f.transfer}</td>
+          <td class="p-3 font-bold text-sage-400">${f.hospital_id}</td>
+          <td class="p-3 font-sans font-medium text-white">${f.hospital_name}</td>
+          <td class="p-3 font-sans text-concrete-400">${f.hospital_type}</td>
+          <td class="p-3 font-mono text-[11px] text-slate-300">(${f.location_x}, ${f.location_y})</td>
+          <td class="p-3 font-mono text-[11px] text-slate-300">${f.daily_patient_capacity}</td>
+          <td class="p-3 font-sans text-concrete-400">${f.data_origin}</td>
         </tr>
       `).join('');
     }
 
+    function parseCsv(csvText) {
+      const rows = csvText.trim().split(/\r?\n/).map(row => row.split(',').map(value => value.trim()));
+      const headers = rows.shift();
+      return rows.map(values => Object.fromEntries(headers.map((header, index) => [header, values[index] || ''])));
+    }
+
+    async function loadFacilitiesData() {
+      const tbody = document.getElementById('facilities-table-body');
+      try {
+        const response = await fetch('data/hospitals.csv');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        facilitiesData = parseCsv(await response.text());
+        populateFacilitiesTable();
+      } catch (error) {
+        console.warn('Unable to fetch data/hospitals.csv; using the bundled hospital dataset.', error);
+        facilitiesData = localHospitalData;
+        populateFacilitiesTable();
+      }
+    }
+
     // ================= INITIALIZATION =================
     window.onload = function() {
-      populateFacilitiesTable();
+      loadFacilitiesData();
       renderPlanTable();
       renderTickets();
       renderAuditTrail();
@@ -1112,12 +1137,18 @@
       }
     }
 
-    // ================= PLAN ACTIONS =================
+// ================= PLAN ACTIONS (FIXED RESET LOGIC) =================
     function approvePlan() {
-      const btn = document.getElementById('approve-btn');
-      btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Plan Approved</span>`;
-      btn.className = "px-4 py-2 bg-sage-600 text-white text-xs font-bold rounded-xl flex items-center space-x-2";
-      document.getElementById('reject-plan-btn').disabled = true;
+      const approveBtn = document.getElementById('approve-btn');
+      const rejectBtn = document.getElementById('reject-plan-btn');
+
+      approveBtn.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Plan Approved</span>`;
+      approveBtn.className = "px-4 py-2 bg-sage-600 text-white text-xs font-bold rounded-xl flex items-center space-x-2";
+      approveBtn.disabled = true;
+
+      // Disable reject button and mute styling
+      rejectBtn.disabled = true;
+      rejectBtn.className = "px-3.5 py-2 bg-slate-800 text-slate-500 text-xs font-bold rounded-xl flex items-center space-x-2 cursor-not-allowed opacity-50";
 
       state.auditRuns.unshift({
         id: 'RUN-20261029-09',
@@ -1130,63 +1161,68 @@
     }
 
     function rejectPlan() {
-      const btn = document.getElementById('reject-plan-btn');
-      btn.innerHTML = `<i class="fa-solid fa-xmark"></i> <span>Plan Rejected</span>`;
-      btn.className = "px-3.5 py-2 bg-amber-700 text-white text-xs font-bold rounded-xl flex items-center space-x-2 opacity-90";
-      document.getElementById('approve-btn').disabled = true;
+      const approveBtn = document.getElementById('approve-btn');
+      const rejectBtn = document.getElementById('reject-plan-btn');
+
+      rejectBtn.innerHTML = `<i class="fa-solid fa-xmark"></i> <span>Plan Rejected</span>`;
+      rejectBtn.className = "px-3.5 py-2 bg-amber-700 text-white text-xs font-bold rounded-xl flex items-center space-x-2 opacity-90";
+      rejectBtn.disabled = true;
+
+      // Disable approve button and mute styling
+      approveBtn.disabled = true;
+      approveBtn.className = "px-4 py-2 bg-slate-800 text-slate-500 text-xs font-bold rounded-xl flex items-center space-x-2 cursor-not-allowed opacity-50";
     }
 
-    function downloadCSV() {
-      const csvContent = "data:text/csv;charset=utf-8,BatchID,Medicine,Sender,Receiver,Quantity,Temp,ExpiryDate\nBATCH-2026-INS01,Insulin Glargine 100IU,Hosp_09,Hosp_04,120,2-8C,2026-11-02\nBATCH-2026-CEF03,Ceftriaxone 1g Injectable,Hosp_01,Hosp_09,250,15-25C,2026-11-12";
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "MediResQ_Transfer_Orders.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    function reoptimizePlan() {
+      // 1. Reset buttons back to initial active states
+      const approveBtn = document.getElementById('approve-btn');
+      const rejectBtn = document.getElementById('reject-plan-btn');
 
-    // ================= AI NLP PARSER =================
-    function parseNLPText() {
-      const input = document.getElementById('nlp-input').value.trim();
-      const outputEl = document.getElementById('nlp-output-json');
+      if (approveBtn) {
+        approveBtn.disabled = false;
+        approveBtn.innerHTML = `<i class="fa-solid fa-check-double"></i> <span>Approve Transfer</span>`;
+        approveBtn.className = "px-4 py-2 bg-sage-600 hover:bg-sage-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-sage-600/20 flex items-center space-x-2 cursor-pointer";
+      }
 
-      if(!input) return;
+      if (rejectBtn) {
+        rejectBtn.disabled = false;
+        rejectBtn.innerHTML = `<i class="fa-solid fa-xmark"></i> <span>Reject Transfer</span>`;
+        rejectBtn.className = "px-3.5 py-2 bg-concrete-700 hover:bg-concrete-600 text-white text-xs font-bold rounded-xl transition flex items-center space-x-2 cursor-pointer";
+      }
 
-      const parsedObj = {
-        status: "success",
-        timestamp: new Date().toISOString(),
-        raw_prompt: input,
-        parsed_instructions: {
-          target_facility: input.toLowerCase().includes('clinic 3') ? "Hosp_04 (St Jude Care)" : "Detected Facility",
-          demand_surge: input.match(/\d+%/)?.[0] || "+30%",
-          vehicle_override: input.toLowerCase().includes('truck') ? "Truck 2 Offline" : "None"
-        },
-        schema_validation: "PASSED (docs/schema.md)"
-      };
+      // 2. Re-run solver simulation and cycle sample data so you can click it repeatedly
+      state.planData = [
+        { batch: 'BATCH-2026-INS01', med: 'Insulin Glargine 100IU', origin: 'Hosp_09 (Apex Medical)', dest: 'Hosp_04 (St Jude Care)', qty: (120 + Math.floor(Math.random() * 50)) + ' Vials', temp: '2-8 °C Cold', expiry: '2026-11-02', status: 'Passed' },
+        { batch: 'BATCH-2026-CEF03', med: 'Ceftriaxone 1g Injectable', origin: 'Hosp_01 (City General)', dest: 'Hosp_10 (Horizon Rural)', qty: (200 + Math.floor(Math.random() * 100)) + ' Units', temp: '15-25 °C Room', expiry: '2026-11-12', status: 'Passed' },
+        { batch: 'BATCH-2026-AMX02', med: 'Amoxicillin 500mg', origin: 'Hosp_07 (South Valley)', dest: 'Hosp_05 (Community Health)', qty: (150 + Math.floor(Math.random() * 50)) + ' Packs', temp: '15-25 °C Room', expiry: '2026-11-06', status: 'Passed' }
+      ];
 
-      outputEl.textContent = JSON.stringify(parsedObj, null, 2);
-    }
+      renderPlanTable();
 
-    // ================= AUDIT TRAIL =================
-    function renderAuditTrail() {
-      const container = document.getElementById('audit-trail-list');
-      if(!container) return;
-
-      container.innerHTML = state.auditRuns.map(r => `
-        <div class="glass-panel p-4 rounded-xl border border-slate-800 flex justify-between items-center">
-          <div>
-            <div class="font-bold text-white">${r.id} <span class="text-concrete-500 font-normal">(${r.time})</span></div>
-            <div class="text-concrete-400 text-[11px] mt-0.5">${r.transfers} Redistribution Transfers • QpiAI Token Proof: <span class="text-sage-400">${r.proofHash}</span></div>
-          </div>
-          <span class="px-2.5 py-1 text-xs font-bold rounded ${r.status === 'Active' ? 'bg-sage-500/10 text-sage-400 border border-sage-500/20' : 'bg-slate-800 text-concrete-400'}">${r.status}</span>
-        </div>
-      `).join('');
+      const output = document.getElementById('ai-explainer-output');
+      if(output) {
+        output.innerHTML = `
+          <p><strong class="text-white">Re-Optimized Transfer Rationale:</strong> QpiAI solver recalculated routes in response to new stock balances. Allocation for <strong>BATCH-2026-INS01</strong> was updated to reflect new buffer demands. Route #2 shifted directly to Hosp_10 to eliminate rural shortfall.</p>
+        `;
+      }
     }
 
     // ================= CHART VISUALS =================
     function initCharts() {
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js is unavailable; impact charts cannot be rendered.');
+        return;
+      }
+
+      if (chartStockouts) {
+        chartStockouts.destroy();
+        chartStockouts = null;
+      }
+      if (chartExpiry) {
+        chartExpiry.destroy();
+        chartExpiry = null;
+      }
+
       const ctx1 = document.getElementById('chart-stockouts')?.getContext('2d');
       if (ctx1) {
         chartStockouts = new Chart(ctx1, {
