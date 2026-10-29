@@ -7,9 +7,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class QpiAlClient:
-    def __init__(self, token: str = "36d305c4fde61888137be5e6cb4dcf3005804b93077b747f35edcf9f00ab68a1"):
-        self.api_url = os.getenv("https://opt-server.qpiai.tech/api/", "https://api.qpial.com/v1/optimize")
-        self.secret_token = token
+    def __init__(self, token: str = None):
+        # Fixed os.getenv usage: first argument is the env key, second is the fallback URL
+        self.api_url = os.getenv("QPIAI_API_URL", "https://opt-server.qpiai.tech/api/")
+        
+        # Pull token securely from environment variables, fallback to argument if passed
+        self.secret_token = token or os.getenv("QPIAI_SECRET_TOKEN")
+        
+        if not self.secret_token:
+            raise ValueError("QpiAI secret token is missing. Set QPIAI_SECRET_TOKEN in your .env file.")
             
         os.makedirs("proofs", exist_ok=True)
 
