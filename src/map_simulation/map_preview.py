@@ -52,7 +52,7 @@ def load_data():
     return hospitals, routes, animations, transfers
 
 
-st.title("🚑 MediResQ AI")
+st.title("MediResQ AI")
 st.subheader("Hospital Medicine Redistribution — Vehicle Simulation")
 
 st.caption(
@@ -548,7 +548,7 @@ st.info(
 # 14. DISPLAY MEDICINE TRANSFER DETAILS
 # --------------------------------------------------
 
-st.markdown("### 💊 Medicine Transfer Details")
+st.markdown("### Medicine Transfer Details")
 
 if not transfers_available:
     st.warning(
@@ -769,7 +769,7 @@ map_html = r"""
 <div id="map"></div>
 
 <div class="control-panel">
-    <strong>🚑 Vehicle Simulation</strong>
+    <strong>Vehicle Simulation</strong>
     <div id="route-name" style="font-size:12px;margin-top:5px;"></div>
 
     <button onclick="startAnimation()">▶ Start</button>
@@ -822,7 +822,7 @@ L.tileLayer(
 // Hospital markers.
 const hospitalIcon = L.divIcon({
     className: "hospital-icon",
-    html: "🏥",
+    html: "",
     iconSize: [28, 28],
     iconAnchor: [14, 14]
 });
@@ -1094,8 +1094,8 @@ legend.onAdd = function() {
     div.innerHTML =
         '<span class="legend-line legend-selected"></span> Selected route<br>' +
         '<span class="legend-line"></span> Other routes<br>' +
-        '🏥 Hospital<br>' +
-        '🚑 Simulated vehicle';
+        'Hospital<br>' +
+        'Simulated vehicle';
 
     return div;
 };
@@ -1122,7 +1122,7 @@ map_html = (
 # 17. RENDER MAP
 # --------------------------------------------------
 
-st.markdown("### 🗺️ Vehicle Movement Simulation")
+st.markdown("### Vehicle Movement Simulation")
 
 st.caption(
     "Select a journey above, then use Start, Pause, or Reset on the map. "

@@ -29,15 +29,15 @@ def load_csv_data(filepath, fallback_df):
     return fallback_df
 
 # --- Header ---
-st.title("💊 MediResQ AI: Data & Optimization Backend")
+st.title(" MediResQ AI: Data & Optimization Backend")
 st.markdown("Managing redistribution datasets (`data/distance_redistribution_plan.csv`) and AI NLP intake pipelines.")
 
 # --- Navigation Tabs (Excluding Map Simulation) ---
 tab1, tab2, tab3, tab4 = st.tabs([
-    "📦 Distance Redistribution Plan & Approval", 
-    "⚡ AI NLP Intake & What-if Parser", 
-    "📊 Impact & Before/After Metrics", 
-    "🔍 Immutable Audit Trail & Proofs"
+    " Distance Redistribution Plan & Approval", 
+    " AI NLP Intake & What-if Parser", 
+    " Impact & Before/After Metrics", 
+    " Immutable Audit Trail & Proofs"
 ])
 
 # --- TAB 1: Distance Redistribution Plan ---
@@ -60,14 +60,14 @@ with tab1:
     
     col_btn1, col_btn2 = st.columns(2)
     with col_btn1:
-        if st.button("🚀 Approve & Lock Plan for Dispatch", type="primary"):
+        if st.button("Approve & Lock Plan for Dispatch", type="primary"):
             os.makedirs("data", exist_ok=True)
             edited_plan.to_csv("data/distance_redistribution_plan.csv", index=False)
             st.success("Plan successfully approved and saved to `data/distance_redistribution_plan.csv`!")
             
     with col_btn2:
         csv_data = edited_plan.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Download Dispatch CSV", data=csv_data, file_name="approved_distance_redistribution_plan.csv", mime="text/csv")
+        st.download_button("Download Dispatch CSV", data=csv_data, file_name="approved_distance_redistribution_plan.csv", mime="text/csv")
 
 # --- TAB 2: AI NLP Intake ---
 with tab2:
