@@ -1,16 +1,21 @@
 Batch ID,Drug Name,From,To,Quantity,Storage,Expiry,Status
-SIM-BATCH-0002,Amoxicillin,H001,Clinic B,50,Ambient,2027-04-14,Optimized & Verified
-SIM-BATCH-0009,Diazepam,H002,Clinic B,50,Ambient,2027-06-16,Optimized & Verified
-SIM-BATCH-0013,ORS Sachets,H001,Clinic B,50,Ambient,2027-06-26,Optimized & Verified
-SIM-BATCH-0014,Doxycycline,H002,Clinic B,50,Ambient,2027-11-19,Optimized & Verified
-SIM-BATCH-0016,Amlodipine,H004,Clinic B,50,Ambient,2027-08-20,Optimized & Verified
-SIM-BATCH-0023,Lumefantrine,H007,Clinic B,50,Ambient,2026-11-25,Optimized & Verified
-SIM-BATCH-0028,Ceftriaxone,H001,Clinic B,50,Ambient,2027-07-03,Optimized & Verified
-SIM-BATCH-0031,Morphine,H006,Clinic B,50,Ambient,2027-11-13,Optimized & Verified
-SIM-BATCH-0032,Tramadol,H005,Clinic B,50,Ambient,2027-07-16,Optimized & Verified
-SIM-BATCH-0033,Codeine,H003,Clinic B,50,Ambient,2026-10-31,Optimized & Verified
-SIM-BATCH-0034,Aspirin,H004,Clinic B,50,Ambient,2027-07-14,Optimized & Verified
-SIM-BATCH-0035,Diclofenac,H006,Clinic B,50,Ambient,2027-11-17,Optimized & Verified
-SIM-BATCH-0036,Naproxen,H002,Clinic B,50,Ambient,2027-12-26,Optimized & Verified
-SIM-BATCH-0039,Betamethasone,H002,Clinic B,50,Ambient,2027-08-17,Optimized & Verified
-SIM-BATCH-0040,Salbutamol,H006,Clinic B,50,Ambient,2027-03-22,Optimized & Verified
+SIM-BATCH-0002,Amoxicillin,H001,H004,50,Ambient,2027-04-14,Optimized & Verified
+SIM-BATCH-0009,Diazepam,H002,H005,50,Ambient,2027-06-16,Optimized & Verified
+SIM-BATCH-0013,ORS Sachets,H001,H006,50,Ambient,2027-06-26,Optimized & Verified
+SIM-BATCH-0014,Doxycycline,H002,H007,50,Ambient,2027-11-19,Optimized & Verified
+SIM-BATCH-0016,Amlodipine,H004,H008,50,Ambient,2027-08-20,Optimized & Verified
+SIM-BATCH-0023,Lumefantrine,H007,H009,50,Ambient,2026-11-25,Optimized & Verified
+SIM-BATCH-0028,Ceftriaxone,H001,H010,50,Ambient,2027-07-03,Optimized & Verified
+SIM-BATCH-0031,Morphine,H006,H001,50,Ambient,2027-11-13,Optimized & Verified
+SIM-BATCH-0032,Tramadol,H005,H002,50,Ambient,2027-07-16,Optimized & Verified
+SIM-BATCH-0033,Codeine,H003,H005,50,Ambient,2026-10-31,Optimized & Verified
+SIM-BATCH-0034,Aspirin,H004,H006,50,Ambient,2027-07-14,Optimized & Verified
+SIM-BATCH-0035,Diclofenac,H006,H005,50,Ambient,2027-11-17,Optimized & Verified
+SIM-BATCH-0036,Naproxen,H002,H006,50,Ambient,2027-12-26,Optimized & Verified
+SIM-BATCH-0039,Betamethasone,H002,H007,50,Ambient,2027-08-17,Optimized & Verified
+SIM-BATCH-0040,Salbutamol,H006,H008,50,Ambient,2027-03-22,Optimized & Verified
+SIM-BATCH-0043,Insulin Regular,H005,H009,50,Ambient,2027-06-09,Optimized & Verified
+SIM-BATCH-0052,Warfarin,H010,H002,50,Ambient,2027-10-14,Optimized & Verified
+SIM-BATCH-0060,Loperamide,H002,H001,50,Ambient,2027-09-22,Optimized & Verified
+SIM-BATCH-0061,Oral Morphine,H004,H002,50,Ambient,2027-12-16,Optimized & Verified
+SIM-BATCH-0062,Pethidine,H002,H003,50,Ambient,2027-02-10,Optimized & Verified
