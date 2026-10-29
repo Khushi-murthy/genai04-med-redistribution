@@ -1,0 +1,3 @@
+Algorithm,Hospitals Evaluated,Average Shortage Rate (%),Highest Shortage Rate (%),Highest Shortage Hospital,Lowest Shortage Rate (%),Lowest Shortage Hospital,Shortage Rate Std Dev
+Baseline,10,95.77,100.0,H009,87.14,H001,4.01
+Distance-Aware,10,95.82,99.15,H007,91.5,H002,2.46

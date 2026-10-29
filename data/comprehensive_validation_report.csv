@@ -1,0 +1,3 @@
+algorithm,transfer_records,total_proposed_units,missing_value_rows,invalid_quantity_rows,self_transfer_rows,unknown_donor_rows,unknown_recipient_rows,unknown_medicine_rows,no_eligible_stock_rows,donor_stock_limit_violations,duplicate_transfer_rows,result
+Baseline,31,3203.0,0,0,0,0,0,0,0,0,0,PASS
+Distance-Aware,21,3203.0,0,0,0,0,0,0,0,0,0,PASS

@@ -1,0 +1,34 @@
+{
+    "problem_name": "medicine_redistribution_genai04",
+    "objective": {
+        "sense": "MAXIMIZE",
+        "primary_goal": "maximize_demand_fulfillment"
+    },
+    "variables": [
+        {
+            "variable_id": "transfer_0_BATCH_001_Hospital_A_to_Clinic_B",
+            "type": "BINARY",
+            "cost_coefficient": -100.0,
+            "metadata": {
+                "batch_id": "BATCH_001",
+                "drug_name": "Paracetamol_500mg",
+                "source": "Hospital_A",
+                "destination": "Clinic_B",
+                "quantity": 100,
+                "is_safe": true,
+                "reasons": []
+            }
+        }
+    ],
+    "constraints": [
+        {
+            "constraint_id": "max_one_transfer_per_batch",
+            "description": "Ensure a single specific batch is not over-allocated across multiple conflicting paths.",
+            "type": "CARDINALITY_LIMIT",
+            "limit": 1
+        }
+    ],
+    "metadata": {
+        "total_candidate_options": 1
+    }
+}

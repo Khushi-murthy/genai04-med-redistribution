@@ -1,0 +1,103 @@
+drug_id,drug_name,category,quantity_in_stock,reorder_level,unit_price_usd,expiry_date,form,supplier
+DRG001,Paracetamol,Analgesic,113,98,25.87,2025-11-14,Tablet,Supplier D
+DRG002,Amoxicillin,Antibiotic,202,53,46.25,2027-04-14,Capsule,Supplier B
+DRG003,Artemether,Antimalarial,165,192,16.61,2025-05-03,Tablet,Supplier C
+DRG004,Metformin,Antidiabetic,449,105,15.13,2025-08-06,Tablet,Supplier A
+DRG005,Lisinopril,Antihypertensive,282,67,30.49,2024-11-20,Tablet,Supplier C
+DRG006,Omeprazole,Antacid,336,65,26.09,2026-06-20,Capsule,Supplier D
+DRG007,Ibuprofen,NSAID,376,77,26.29,2025-12-26,Tablet,Supplier B
+DRG008,Ciprofloxacin,Antibiotic,172,140,7.45,2026-05-03,Tablet,Supplier B
+DRG009,Diazepam,Sedative,312,120,41.15,2027-06-16,Tablet,Supplier A
+DRG010,Folic Acid,Supplement,137,82,20.95,2026-08-31,Tablet,Supplier A
+DRG011,Vitamin C,Supplement,210,190,29.5,2024-01-09,Tablet,Supplier D
+DRG012,Zinc Sulphate,Supplement,492,196,7.91,2026-03-25,Tablet,Supplier C
+DRG013,ORS Sachets,Rehydration,310,78,19.29,2027-06-26,Sachet,Supplier D
+DRG014,Doxycycline,Antibiotic,234,123,36.29,2027-11-19,Capsule,Supplier C
+DRG015,Cotrimoxazole,Antibiotic,200,184,27.99,2025-12-23,Tablet,Supplier D
+DRG016,Amlodipine,Antihypertensive,164,51,39.46,2027-08-20,Tablet,Supplier D
+DRG017,Atenolol,Antihypertensive,227,126,9.62,2026-02-18,Tablet,Supplier C
+DRG018,Hydrocortisone,Steroid,223,197,19.16,2024-10-23,Injection,Supplier B
+DRG019,Fluconazole,Antifungal,420,134,16.53,2024-06-29,Capsule,Supplier B
+DRG020,Metronidazole,Antibiotic,104,159,44.62,2025-10-29,Tablet,Supplier A
+DRG021,Chloroquine,Antimalarial,24,115,28.46,2024-02-22,Tablet,Supplier D
+DRG022,Quinine,Antimalarial,471,187,38.79,2025-09-06,Tablet,Supplier D
+DRG023,Lumefantrine,Antimalarial,422,182,36.49,2026-11-25,Tablet,Supplier D
+DRG024,Azithromycin,Antibiotic,237,141,2.52,2026-03-08,Tablet,Supplier C
+DRG025,Erythromycin,Antibiotic,485,52,33.99,2026-07-16,Tablet,Supplier B
+DRG026,Ampicillin,Antibiotic,209,145,25.29,2024-07-21,Injection,Supplier B
+DRG027,Gentamicin,Antibiotic,493,157,24.59,2025-01-20,Injection,Supplier D
+DRG028,Ceftriaxone,Antibiotic,460,200,17.49,2027-07-03,Injection,Supplier A
+DRG029,Penicillin V,Antibiotic,185,131,18.65,2024-12-15,Tablet,Supplier A
+DRG030,Cloxacillin,Antibiotic,262,94,5.97,2025-09-28,Capsule,Supplier C
+DRG031,Morphine,Analgesic,175,180,44.46,2027-11-13,Injection,Supplier D
+DRG032,Tramadol,Analgesic,80,184,14.85,2027-07-16,Capsule,Supplier B
+DRG033,Codeine,Analgesic,457,98,20.91,2026-10-31,Tablet,Supplier A
+DRG034,Aspirin,Analgesic,289,77,17.98,2027-07-14,Tablet,Supplier A
+DRG035,Diclofenac,NSAID,210,52,39.49,2027-11-17,Tablet,Supplier C
+DRG036,Naproxen,NSAID,353,191,0.69,2027-12-26,Tablet,Supplier C
+DRG037,Prednisolone,Steroid,431,75,29.52,2026-03-25,Tablet,Supplier A
+DRG038,Dexamethasone,Steroid,89,177,38.56,2025-02-06,Injection,Supplier C
+DRG039,Betamethasone,Steroid,458,186,25.96,2027-08-17,Injection,Supplier B
+DRG040,Salbutamol,Bronchodilator,101,155,30.29,2027-03-22,Syrup,Supplier B
+DRG041,Theophylline,Bronchodilator,265,180,5.78,2024-11-17,Tablet,Supplier A
+DRG042,Aminophylline,Bronchodilator,87,183,24.78,2024-06-04,Injection,Supplier D
+DRG043,Insulin Regular,Antidiabetic,220,65,32.68,2027-06-09,Injection,Supplier C
+DRG044,Insulin NPH,Antidiabetic,366,110,18.02,2024-10-21,Injection,Supplier B
+DRG045,Glibenclamide,Antidiabetic,136,75,43.04,2024-03-08,Tablet,Supplier A
+DRG046,Metoprolol,Antihypertensive,98,165,31.39,2025-12-15,Tablet,Supplier A
+DRG047,Captopril,Antihypertensive,112,151,29.34,2024-04-21,Tablet,Supplier A
+DRG048,Hydrochlorothiazide,Diuretic,27,111,12.84,2026-06-19,Tablet,Supplier A
+DRG049,Furosemide,Diuretic,476,200,42.81,2024-11-22,Tablet,Supplier C
+DRG050,Spironolactone,Diuretic,460,166,15.53,2024-01-13,Tablet,Supplier C
+DRG051,Digoxin,Cardiac,486,67,12.52,2026-10-11,Tablet,Supplier D
+DRG052,Warfarin,Anticoagulant,367,199,11.46,2027-10-14,Tablet,Supplier C
+DRG053,Heparin,Anticoagulant,448,174,1.61,2026-03-27,Injection,Supplier B
+DRG054,Atorvastatin,Lipid-lowering,88,93,18.24,2024-06-28,Tablet,Supplier B
+DRG055,Simvastatin,Lipid-lowering,497,124,20.1,2024-01-16,Tablet,Supplier C
+DRG056,Nifedipine,Antihypertensive,171,186,43.64,2024-08-23,Tablet,Supplier C
+DRG057,Verapamil,Antihypertensive,333,66,48.08,2026-04-05,Tablet,Supplier D
+DRG058,Ranitidine,Antacid,283,112,19.67,2025-12-20,Tablet,Supplier D
+DRG059,Antacid Suspension,Antacid,176,110,22.06,2025-08-03,Syrup,Supplier C
+DRG060,Loperamide,Antidiarrhoeal,12,137,40.34,2027-09-22,Tablet,Supplier B
+DRG061,Oral Morphine,Analgesic,66,73,10.22,2027-12-16,Syrup,Supplier B
+DRG062,Pethidine,Analgesic,226,169,41.9,2027-02-10,Injection,Supplier B
+DRG063,Phenobarbitone,Anticonvulsant,188,140,11.22,2024-11-22,Tablet,Supplier D
+DRG064,Phenytoin,Anticonvulsant,322,198,10.8,2026-02-10,Tablet,Supplier D
+DRG065,Carbamazepine,Anticonvulsant,104,108,42.99,2026-10-30,Tablet,Supplier B
+DRG066,Valproic Acid,Anticonvulsant,133,162,29.58,2027-12-17,Tablet,Supplier C
+DRG067,Haloperidol,Antipsychotic,126,153,30.61,2026-12-30,Tablet,Supplier B
+DRG068,Chlorpromazine,Antipsychotic,446,81,34.05,2024-09-14,Tablet,Supplier A
+DRG069,Amitriptyline,Antidepressant,436,119,36.93,2027-01-16,Tablet,Supplier D
+DRG070,Fluoxetine,Antidepressant,336,195,7.68,2024-02-28,Capsule,Supplier A
+DRG071,Diazepam Syrup,Sedative,363,72,34.89,2026-03-09,Syrup,Supplier B
+DRG072,Promethazine,Antihistamine,96,77,3.87,2025-10-19,Tablet,Supplier C
+DRG073,Chlorpheniramine,Antihistamine,388,126,10.04,2026-10-21,Tablet,Supplier C
+DRG074,Loratadine,Antihistamine,115,123,6.74,2024-06-29,Tablet,Supplier D
+DRG075,Cetirizine,Antihistamine,182,153,42.3,2025-08-01,Tablet,Supplier D
+DRG076,Vitamin A,Supplement,451,83,46.87,2027-07-10,Tablet,Supplier B
+DRG077,Vitamin B Complex,Supplement,187,139,44.9,2024-03-01,Tablet,Supplier A
+DRG078,Iron Sulphate,Supplement,360,168,12.8,2027-09-11,Tablet,Supplier D
+DRG079,Calcium Gluconate,Supplement,463,75,9.49,2025-12-22,Injection,Supplier A
+DRG080,Magnesium Sulphate,Supplement,467,106,35.77,2025-07-08,Injection,Supplier A
+DRG081,Oxytocin,Oxytocic,20,91,21.82,2026-04-08,Injection,Supplier C
+DRG082,Ergometrine,Oxytocic,194,60,27.84,2024-11-15,Injection,Supplier B
+DRG083,Misoprostol,Oxytocic,429,108,28.72,2027-03-02,Tablet,Supplier C
+DRG084,Nystatin,Antifungal,343,197,17.78,2026-06-09,Tablet,Supplier A
+DRG085,Griseofulvin,Antifungal,427,123,45.1,2024-08-17,Tablet,Supplier A
+DRG086,Ketoconazole,Antifungal,348,78,2.34,2025-05-15,Tablet,Supplier C
+DRG087,Acyclovir,Antiviral,397,138,37.6,2025-03-06,Tablet,Supplier A
+DRG088,Oseltamivir,Antiviral,355,150,49.91,2026-05-04,Capsule,Supplier B
+DRG089,Tenofovir,Antiretroviral,269,73,17.78,2025-07-29,Tablet,Supplier D
+DRG090,Lamivudine,Antiretroviral,476,137,34.74,2026-06-25,Tablet,Supplier D
+DRG091,Efavirenz,Antiretroviral,27,102,21.7,2026-11-07,Tablet,Supplier B
+DRG092,Nevirapine,Antiretroviral,390,98,2.66,2026-09-29,Tablet,Supplier C
+DRG093,Co-Artemether,Antimalarial,279,91,48.49,2024-12-23,Tablet,Supplier B
+DRG094,Sulfadoxine-Pyrimethamine,Antimalarial,133,113,48.2,2027-01-18,Tablet,Supplier B
+DRG095,Tetracycline,Antibiotic,177,155,5.08,2026-01-02,Capsule,Supplier C
+DRG096,Rifampicin,Antituberculosis,69,174,33.68,2024-10-07,Tablet,Supplier B
+DRG097,Isoniazid,Antituberculosis,123,51,26.01,2027-12-16,Tablet,Supplier D
+DRG098,Pyrazinamide,Antituberculosis,479,139,35.05,2024-09-29,Tablet,Supplier B
+DRG099,Ethambutol,Antituberculosis,72,200,28.38,2027-12-20,Tablet,Supplier C
+DRG100,Streptomycin,Antituberculosis,417,80,27.64,2027-07-13,Injection,Supplier B
+DRG101,BCG Vaccine,Vaccine,341,89,30.13,2027-10-18,Injection,Supplier D
+DRG102,Measles Vaccine,Vaccine,425,102,6.17,2026-04-11,Injection,Supplier C

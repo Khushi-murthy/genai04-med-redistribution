@@ -1,0 +1,11 @@
+hospital_id,hospital_name,hospital_type,location_x,location_y,daily_patient_capacity,data_origin
+H001,Synthetic Central Hospital,Large Hospital,10,20,500,SYNTHETIC
+H002,Synthetic North Clinic,Small Clinic,15,25,80,SYNTHETIC
+H003,Synthetic South Hospital,Medium Hospital,30,10,250,SYNTHETIC
+H004,Synthetic East Clinic,Small Clinic,40,30,60,SYNTHETIC
+H005,Synthetic West Hospital,Medium Hospital,5,40,220,SYNTHETIC
+H006,Synthetic Community Clinic,Small Clinic,25,35,50,SYNTHETIC
+H007,Synthetic City Hospital,Large Hospital,45,15,450,SYNTHETIC
+H008,Synthetic Rural Clinic,Small Clinic,50,45,40,SYNTHETIC
+H009,Synthetic General Hospital,Medium Hospital,35,45,180,SYNTHETIC
+H010,Synthetic Emergency Clinic,Small Clinic,20,5,70,SYNTHETIC

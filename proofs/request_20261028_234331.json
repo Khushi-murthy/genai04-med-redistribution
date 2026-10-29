@@ -1,0 +1,16 @@
+{
+    "problem_type": "medicine_redistribution",
+    "test_mode": true,
+    "data": {
+        "hospitals": [
+            "H1",
+            "H2"
+        ],
+        "batches": [
+            {
+                "id": "B1",
+                "qty": 100
+            }
+        ]
+    }
+}

@@ -1,0 +1,6 @@
+{
+    "status_code": 503,
+    "response": {
+        "error": "HTTPSConnectionPool(host='api.qpial.com', port=443): Max retries exceeded with url: /v1/optimize (Caused by NameResolutionError(\"HTTPSConnection(host='api.qpial.com', port=443): Failed to resolve 'api.qpial.com' ([Errno 11001] getaddrinfo failed)\"))"
+    }
+}
