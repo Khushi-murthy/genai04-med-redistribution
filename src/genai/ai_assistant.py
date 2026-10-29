@@ -39,6 +39,6 @@ class AIAssistant:
         if "up" in text_lower or "increase" in text_lower:
             for word in text_lower.split():
                 if "%" in word or word.isdigit():
-                    parsed_result["value"] = int(''.filter(str.isdigit, word) or 20)
+                    parsed_result["value"] = int(''.join(c for c in word if c.isdigit()) or 20)
                     
         return parsed_result
